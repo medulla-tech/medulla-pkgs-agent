@@ -1,7 +1,7 @@
 <?php
     /*
     *
-    * (c) 2016 siveo, http://www.siveo.net
+    * (c) 2016-2020 siveo, http://www.siveo.net
     *
     * This file is part of Pulse 2, http://www.siveo.net
     *
@@ -20,23 +20,24 @@
     * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     */
     require_once("func_include.inc.php");
-    
+
     function xmlCall($method, $params = null) {
         $GLOBALS['message'] = "warning";
         if ( is_session_started() === FALSE ) {
-            # session n'existe pas on charge la session
+            // The session doesn't exist load the session
             session_start();
             start_config();
         }
         if (!test_sessiondata("warning")){
-            # session existe il manque des informations
+            // Session exists, but some infos are missing
+
             start_config();
         }
         if (!test_sessiondata("error")){
             msg("terminate script on error session value","error");
         }
         $_SESSION['auth'] = base64_encode($_SESSION['user'].":".$_SESSION['password']);
-    
+
         $functrim = function($value) {return trim($value);};
         $array_ip_accept=explode ("," , $_SESSION['remoteadress']);
         $array_ip_accept_remote = array_map($functrim, $array_ip_accept);
@@ -44,12 +45,12 @@
             msg("terminate script on error remote ip forbiden","error");
             exit(0);
         }
-    
+
        $auth = $_SESSION['auth'];
        $request = xmlrpc_encode_request($method, $params);
-       $header = (version_compare(phpversion(), '5.2.8')) 
+       $header = (version_compare(phpversion(), '5.2.8'))
                     ? array("Content-Type: text/xml","Authorization: Basic $auth")
-                    : "Content-Type: text/xml\r\nAuthorization: Basic $auth" ; //[1] 
+                    : "Content-Type: text/xml\r\nAuthorization: Basic $auth" ; //[1]
         if ($_SESSION['enablessl']){
             $contextstruct=array(
                 "http" => array("method" => "POST",
@@ -71,18 +72,16 @@
                                 "content" => $request,));
             $uri = sprintf("http://%s:%s/",$_SESSION['host'],$_SESSION['port']);
         }
-        # creation du context    
+        // creation of the context
         $context = stream_context_create($contextstruct);
         $file = @file_get_contents($uri, false, $context);
-        # on recupere le code html en analisant le header de retour
-        $code=getHttpCode($http_response_header);
-        if ($code != 200){
-            # on a pas 200 on envoi 1 log avec le code erreur
+        // Get html code by analizing returned header
+        if (http_response_code() != 200){
+            // If the return code is not 200, send error code to logs
             msg(display_http_response_code($code), "error");
         }else
         {
             $response = xmlrpc_decode($file);
-            print_r($response);
             if ($response && xmlrpc_is_fault($response)) {
                 trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
                 return "error";
@@ -92,5 +91,4 @@
         }
         return "error";
     }
-    // xmlCall("add",array(1, 2) );
-?> 
+?>

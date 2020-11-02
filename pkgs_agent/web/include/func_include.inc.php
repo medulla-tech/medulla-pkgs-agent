@@ -1,7 +1,7 @@
 <?
     /*
     *
-    * (c) 2016 siveo, http://www.siveo.net
+    * (c) 2016-2020 siveo, http://www.siveo.net
     *
     * This file is part of Pulse 2, http://www.siveo.net
     *
@@ -19,19 +19,21 @@
     * along with MMC; if not, write to the Free Software
     * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     */
-    define("INI_FILE_PKGS","/etc/pkgs/pulse_agent_xmlrpc_pkgs.ini");
+
+    //See later to change this
+    define("INI_FILE_PKGS","/etc/pulse_pkgs_agent/pulse_agent_xmlrpc_pkgs.ini");
 
     function msg($msg, $type=NULL){
-        if (!is_null ()) $GLOBALS['message'] = $type;
+        if (!is_null ($type)) $GLOBALS['message'] = $type;
         if ($GLOBALS['message'] == "warning"){
             error_log (sprintf("Warning : [script %s] %s",
-                                    $_SERVER[PHP_SELF],
-                                    $message));
+                                    $_SERVER['PHP_SELF'],
+                                    $msg));
         }
         else{
             error_log (sprintf("Error : [script %s] %s",
-                                    $_SERVER[PHP_SELF],
-                                    $message));
+                                    $_SERVER['PHP_SELF'],
+                                    $msg));
         }
     }
 
@@ -63,7 +65,7 @@
         }
         return true;
     }
-    
+
     function start_config() {
         # on charge la configuration
         $ini_array = parse_ini_file(INI_FILE_PKGS);
@@ -129,15 +131,4 @@
         };
         return $text;
     }
-
-    function getHttpCode($http_response_header) {
-        if(is_array($http_response_header))
-        {
-            $parts=explode(' ',$http_response_header[0]);
-            if(count($parts)>1) //HTTP/1.0 <code> <text>
-                return intval($parts[1]); //Get code
-        }
-        return 0;
-    }
-    
     ?>
