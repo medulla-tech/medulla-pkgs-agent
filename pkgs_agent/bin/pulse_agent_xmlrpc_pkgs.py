@@ -135,7 +135,7 @@ class Apppkgs(object):
         self.config = confParameter(opts.dft_inifile)
         self.opts = opts
         self.daemon = opts.deamon
-        self.PIDFile = "/var/run/ripright/pkgsagent.pid"
+        self.PIDFile = "/var/run/pkgsagent/pulse_pkgs_agent.pid"
         
         # activate module.
 
