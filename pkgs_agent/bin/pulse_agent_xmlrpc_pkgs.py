@@ -1,11 +1,20 @@
 #! /usr/bin/python
 # -*- coding: utf-8; -*-
-# (c) 2016 Siveo, http://www.siveo.net
-# 
+# This file is part of Management Console (MMC).
+#
+# MMC is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# MMC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program If not, see <http://www.gnu.org/licenses/>.
+# along with MMC; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import time
 import xmlrpclib
@@ -31,12 +40,19 @@ from resource import RLIMIT_NOFILE, RLIM_INFINITY, getrlimit
 import logging
 
 # directory pkgs_agent
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")))
 
+
+sys.path.append("/usr/lib/python2.7/dist-packages/pulse_pkgs_agent/")
 from lib.xml_rpc_pkgs import pkgsxmlrpc
 from lib.configuration import confParameter
 from lib.utils import writePid, cleanPid, makeSSLContext
 from lib.xml_rpc_server import TwistedRPCServer
+from lib.plugins.xmpp import XmppMasterDatabase
+from lib.plugins.glpi import Glpi
+from lib.plugins.kiosk import KioskDatabase
+from lib.plugins.msc import MscDatabase
+from lib.plugins.pkgs import PkgsDatabase
 
 logger = logging.getLogger()
 
@@ -131,7 +147,28 @@ class Apppkgs(object):
         self.opts = opts
         self.daemon = opts.deamon
         self.PIDFile = "/var/run/ripright/pkgsagent.pid"
-        
+        # activate module.
+
+        if "glpi" in self.config.plugins_list:
+            logger.info("activate GLPI")
+            Glpi().activate()
+
+        if "xmpp" in self.config.plugins_list:
+            logger.info("activate XMPP")
+            XmppMasterDatabase().activate()
+
+        if "kiosk" in self.config.plugins_list:
+            logger.info("activate KIOSK")
+            KioskDatabase().activate()
+
+        if "msc" in self.config.plugins_list:
+            logger.info("activate MSC")
+            MscDatabase().activate()
+
+        if "pkgs" in self.config.plugins_list:
+            logger.info("activate PKGS")
+            PkgsDatabase().activate()
+
     def run(self):
         r = TwistedRPCServer(self.config.user,
                              self.config.password)
@@ -142,7 +179,7 @@ class Apppkgs(object):
             sslContext = makeSSLContext(self.config.verifypeer,
                                         self.config.cacert,
                                         self.config.localcert)
-            
+
             reactor.listenSSL(self.config.port,
                               server.Site(r),
                               interface=self.config.host,
@@ -166,7 +203,7 @@ class Apppkgs(object):
         """
         logger.info('Pkgs-agent stop...')
         cleanPid(self.PIDFile)
-    
+
     def kill(self):
         pid = self.readPid(self.PIDFile)
         if pid is None:
@@ -186,7 +223,7 @@ if __name__ == '__main__':
     elif sys.platform.startswith('win') or sys.platform.startswith('darwin') :
         print "Pulse agent must be running on ARS linux os"
         sys.exit(0)
-    
+
     optp = OptionParser()
     optp.add_option("-d",
                     "--deamon",
@@ -201,7 +238,7 @@ if __name__ == '__main__':
                     default = False,
                     help="console debug")
     optp.add_option("-f",
-                    "--inifile", 
+                    "--inifile",
                     dest="dft_inifile",
                     default=os.path.join("etc",
                                          "pulse",
@@ -224,7 +261,7 @@ if __name__ == '__main__':
                     default=False,
                     action="store_true",
                     help="Reload configuration")
-    
+
     opts, args = optp.parse_args()
     config = confParameter(opts.dft_inifile)
 
