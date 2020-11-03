@@ -1,11 +1,9 @@
+#! /usr/bin/python
 # -*- coding: utf-8; -*-
 #
-# (c) 2004-2007 Linbox / Free&ALter Soft, http://linbox.com
-# (c) 2007-2009 Mandriva, http://www.mandriva.com/
+# (c) 2020 siveo, http://www.siveo.net
 #
-# $Id$
-#
-# This file is part of Pulse 2, http://pulse2.mandriva.org
+# This file is part of Pulse 2, http://www.siveo.net
 #
 # Pulse 2 is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,8 +97,8 @@ class PkgsDatabase(DatabaseHelper):
                                                                                 self.config.pkgs_dbhost,
                                                                                 self.config.pkgs_dbport,
                                                                                 self.config.pkgs_dbname),
-                                                    pool_recycle=self.config.dbpoolrecycle,
-                                                    pool_size=self.config.dbpoolsize,
+                                                    pool_recycle=self.config.pkgs_dbpoolrecycle,
+                                                    pool_size=self.config.pkgs_dbpoolsize,
                                                     pool_timeout=self.config.pkgs_dbpooltimeout,
                                                     convert_unicode=True)
 
@@ -174,7 +172,7 @@ class PkgsDatabase(DatabaseHelper):
         mapper(Syncthingsync, self.syncthingsync)
         mapper(Package_pending_exclusions, self.package_pending_exclusions)
     ####################################
-  
+
     @DatabaseHelper._sessionm
     def createPackage(self, session, package):
         """

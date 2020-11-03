@@ -1,9 +1,9 @@
 #! /usr/bin/python
 # -*- coding: utf-8; -*-
-# (c) 2016 Siveo, http://www.siveo.net
+# (c) 2016-2020 Siveo, http://www.siveo.net
 # $Id$
 #
-# This file is part of Mandriva Management Console (MMC).
+# This file is part of Management Console (MMC).
 #
 # MMC is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class confParameter:
         Config = ConfigParser.ConfigParser()
         Config.read(self.dft_inifile)
         if os.path.exists(self.dft_inifile + ".local"):
-            Config.read(self.dft_inifile + ".local")    
+            Config.read(self.dft_inifile + ".local")
 
         if Config.has_option("xmlrpc", "user"):
             self.user = Config.get('xmlrpc',
@@ -84,22 +84,28 @@ class confParameter:
             self.verifypeer = Config.getboolean('xmlrpc',
                                                 'verifypeer')
 
-        self.port = 7080
+        self.port = 7081
         if Config.has_option("xmlrpc", "port"):
-            self.host = Config.getint('xmlrpc',
+            self.port = Config.getint('xmlrpc',
                                       'port')
+
 
         self.host = "localhost"
         if Config.has_option("xmlrpc", "host"):
             self.host = Config.get('xmlrpc',
                                    'host')
- 
+
+        self.timeoutheader = 15
+        if Config.has_option("xmlrpc", "timeoutheader"):
+            self.host = Config.get('xmlrpc',
+                                   'timeoutheader')
+
         self.log_level = "INFO"
         if Config.has_option("global", "log_level"):
             self.log_level = Config.get('global',
                                         'log_level')
 
-        self.logfile = "/var/log/pkgs/pkgs_agent.log" 
+        self.logfile = "/var/log/pkgs/pkgs_agent.log"
         if Config.has_option("global", "logfile"):
             self.logfile = Config.get('global',
                                       'logfile')
@@ -118,8 +124,8 @@ class confParameter:
             self.log_level = 0
         else:
             self.log_level = 20
-    
-    # activate connection to base module
+
+        # activate connection to base module
         self.plugins_list = ["xmpp", "pkgs"]
         if Config.has_option("global", "activate_plugin"):
             listplugsql = Config.get('global', 'activate_plugin')
@@ -211,6 +217,13 @@ class confParameter:
         if confiobject.has_option("pkgsdatabase", "pkgs_dbpasswd"):
             self.pkgs_dbpasswd = confiobject.get('pkgsdatabase', 'pkgs_dbpasswd')
 
+        self.pkgs_dbpoolrecycle = 5
+        if confiobject.has_option("pkgsdatabase", "pkgs_dbpoolrecycle"):
+            self.pkgs_dbpoolrecycle = confiobject.get('pkgsdatabase', 'pkgs_dbpoolrecycle')
+
+        self.pkgs_dbpoolsize = 60
+        if confiobject.has_option("pkgsdatabase", "pkgs_dbpoolsize"):
+            self.pkgs_dbpoolsize = confiobject.get('pkgsdatabase', 'pkgs_dbpoolsize')
     def readConfxmpp(self, confiobject):
         self.xmpp_dbhost = "localhost"
         if confiobject.has_option("xmppdatabase", "xmpp_dbhost"):
@@ -231,6 +244,14 @@ class confParameter:
         self.xmpp_dbpasswd = "mmc"
         if confiobject.has_option("xmppdatabase", "xmpp_dbpasswd"):
             self.xmpp_dbpasswd = confiobject.get('xmppdatabase', 'xmpp_dbpasswd')
+
+        self.xmpp_dbpoolrecycle = 5
+        if confiobject.has_option("xmppdatabase","xmpp_dbpoolrecycle"):
+            self.xmpp_dbpoolrecycle = confiobject.get('xmppdatabase', 'xmpp_bdpoolrecycle')
+
+        self.xmpp_dbpoolsize = 60
+        if confiobject.has_option("xmppdatabase", "xmpp_dbpoolsize"):
+            self.xmpp_dbpoolsize = confiobject.get('xmppdatabase', 'xmpp_dbpoolsize')
 
     def readConfglpi(self, confiobject):
         self.inventory_url = "http://localhost:9999/"
@@ -312,4 +333,3 @@ class confParameter:
                                                                    'url': confiobject.get('manufacturer_' + manufacturer_key, 'url'),
                                                                    'params': params}
             logging.getLogger().debug(self.manufacturerWarranty)
-            

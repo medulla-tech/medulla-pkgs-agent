@@ -1,10 +1,10 @@
 # -*- coding: utf-8; -*-
 #
-# (c) 2016 siveo, http://www.siveo.net/
+# (c) 2020 siveo, http://www.siveo.net/
 #
 # $Id$
 #
-# This file is part of Mandriva Management Console (MMC).
+# This file is part of Management Console (MMC).
 #
 # MMC is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # along with MMC; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# file : pulse_xmpp_master_substitute/lib/plugins/xmpp/__init__.py
+# file : pulse_pkgs_agent/lib/plugins/xmpp/__init__.py
 """
 xmppmaster database handler
 """
@@ -151,8 +151,8 @@ class XmppMasterDatabase(DatabaseHelper):
                                                                                  self.config.xmpp_dbhost,
                                                                                  self.config.xmpp_dbport,
                                                                                  self.config.xmpp_dbname),
-                                                     pool_recycle=self.config.dbpoolrecycle,
-                                                     pool_size=self.config.dbpoolsize)
+                                                     pool_recycle=self.config.xmpp_dbpoolrecycle,
+                                                     pool_size=self.config.xmpp_dbpoolsize)
         self.Sessionxmpp = sessionmaker(bind=self.engine_xmppmmaster_base)
         self.is_activated = True
         self.logger.debug("xmpp finish activation")
