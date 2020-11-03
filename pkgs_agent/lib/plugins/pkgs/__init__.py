@@ -43,6 +43,9 @@ from lib.plugins.pkgs.orm.extensions import Extensions
 from lib.plugins.pkgs.orm.package_pending_exclusions import Package_pending_exclusions
 from lib.plugins.pkgs.orm.packages import Packages
 from lib.plugins.pkgs.orm.syncthingsync import Syncthingsync
+from lib.plugins.pkgs.orm.pkgs_shares import Pkgs_shares
+from lib.plugins.pkgs.orm.pkgs_ars_share import Pkgs_ars_share
+from lib.plugins.pkgs.orm.pkgs_ars_web_shares import Pkgs_ars_web_shares
 from lib.configuration import confParameter
 from lib.plugins.xmpp import XmppMasterDatabase
 # Imported last
@@ -157,6 +160,27 @@ class PkgsDatabase(DatabaseHelper):
                 autoload = True
             )
 
+            #pkgs_ars_web_shares
+            self.pkgs_ars_web_shares = Table(
+                "pkgs_ars_web_shares",
+                self.metadata,
+                autoload = True
+            )
+
+            #pkgs_ars_share
+            self.pkgs_ars_share = Table(
+                "pkgs_ars_share",
+                self.metadata,
+                autoload = True
+            )
+
+            #pkgs_shares
+            self.pkgs_shares = Table(
+                "pkgs_shares",
+                self.metadata,
+                autoload = True
+            )
+
         except NoSuchTableError, e:
             self.logger.error("Cant load the Pkgs database : table '%s' does not exists"%(str(e.args[0])))
             return False
@@ -171,6 +195,10 @@ class PkgsDatabase(DatabaseHelper):
         mapper(Dependencies, self.dependencies)
         mapper(Syncthingsync, self.syncthingsync)
         mapper(Package_pending_exclusions, self.package_pending_exclusions)
+        mapper(Pkgs_shares, self.pkgs_shares)
+        mapper(Pkgs_ars_share, self.pkgs_ars_share)
+        mapper(Pkgs_ars_web_shares, self.pkgs_ars_web_shares)
+
     ####################################
 
     @DatabaseHelper._sessionm
@@ -555,3 +583,60 @@ class PkgsDatabase(DatabaseHelper):
         query = query.delete(synchronize_session='fetch')
         session.commit()
         session.flush()
+
+    # =====================================================================
+    # pkgs FUNCTIONS manage share
+    # =====================================================================
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_shares( self, name, comments,
+                        enabled, type,
+                        uri, ars_name,
+                        ars_id, path_pakage):
+        try:
+            new_Pkgs_shares = Pkgs_shares()
+            new_Pkgs_shares.name = name
+            new_Pkgs_shares.comments = comments
+            new_Pkgs_shares.enabled = enabled
+            new_Pkgs_shares.type = type
+            new_Pkgs_shares.uri = uri
+            new_Pkgs_shares.ars_name = ars_name
+            new_Pkgs_shares.ars_id = ars_id
+            new_Pkgs_shares.path_pakage = path_pakage
+            session.add(new_Pkgs_shares)
+            session.commit()
+            session.flush()
+        except Exception, e:
+            logging.getLogger().error(str(e))
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_ars_share( self,id,hostname,jid)
+        try:
+            new_Pkgs_ars_share = Pkgs_ars_share()
+            new_Pkgs_ars_share.id = id
+            new_Pkgs_ars_share.jid =  jid
+            session.add(new_Pkgs_ars_share)
+            session.commit()
+            session.flush()
+        except Exception, e:
+            logging.getLogger().error(str(e))
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_ars_web_shares( self, pkgs_share_id, 
+                               ars_share_id, packages_id, 
+                               status, finger_print, size, 
+                               edition_date)
+        try:
+            new_Pkgs_ars_web_shares = Pkgs_ars_web_shares()
+            new_Pkgs_ars_web_shares.pkgs_share_id = pkgs_share_id
+            new_Pkgs_ars_web_shares.ars_share_id =  ars_share_id
+            new_Pkgs_ars_web_shares.packages_id = packages_id
+            new_Pkgs_ars_web_shares.status =  status
+            new_Pkgs_ars_web_shares.finger_print =  finger_print
+            new_Pkgs_ars_web_shares.size = size
+            new_Pkgs_ars_web_shares.edition_date =  edition_date
+            session.add(new_Syncthingsync)
+            session.commit()
+            session.flush()
+        except Exception, e:
+            logging.getLogger().error(str(e))
