@@ -37,6 +37,11 @@ from lib.xml_rpc_pkgs import pkgsxmlrpc
 from lib.configuration import confParameter
 from lib.utils import writePid, cleanPid, makeSSLContext
 from lib.xml_rpc_server import TwistedRPCServer
+from lib.plugins.xmpp import XmppMasterDatabase
+from lib.plugins.glpi import Glpi
+from lib.plugins.kiosk import KioskDatabase
+from lib.plugins.msc import MscDatabase
+from lib.plugins.pkgs import PkgsDatabase
 
 logger = logging.getLogger()
 
@@ -132,6 +137,28 @@ class Apppkgs(object):
         self.daemon = opts.deamon
         self.PIDFile = "/var/run/ripright/pkgsagent.pid"
         
+        # activate module.
+
+        if "glpi" in self.config.plugins_list:
+            logger.info("activate GLPI")
+            Glpi().activate()
+
+        if "xmpp" in self.config.plugins_list:
+            logger.info("activate XMPP")
+            XmppMasterDatabase().activate()
+
+        if "kiosk" in self.config.plugins_list:
+            logger.info("activate KIOSK")
+            KioskDatabase().activate()
+
+        if "msc" in self.config.plugins_list:
+            logger.info("activate MSC")
+            MscDatabase().activate()
+
+        if "pkgs" in self.config.plugins_list:
+            logger.info("activate PKGS")
+            PkgsDatabase().activate()
+
     def run(self):
         r = TwistedRPCServer(self.config.user,
                              self.config.password)
