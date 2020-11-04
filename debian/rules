@@ -1,15 +1,15 @@
 #!/usr/bin/make -f
 
-DESTDIR = $(CURDIR)/debian/pulse-pkgs-agent
+DESTDIR=$(CURDIR)/debian/tmp
 
 build:
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
-	cp pkgs_agent/__init__.py $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
-	cp -fr pkgs_agent/lib $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
-	mkdir -p $(CURDIR)/debian/tmp/usr/sbin/
-	cp pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py $(CURDIR)/debian/tmp/usr/sbin/
-	mkdir -p $(CURDIR)/debian/tmp/usr/share/pkgs
-	cp -fr ./pkgs_agent/web/* $(CURDIR)/debian/tmp/usr/share/pkgs
+	mkdir -p $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
+	cp -fv pkgs_agent/__init__.py $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
+	cp -fr pkgs_agent/lib $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
+	mkdir -p $(DESTDIR)/usr/sbin/
+	cp -fv pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py $(DESTDIR)/usr/sbin/
+	mkdir -p $(DESTDIR)/usr/share/pkgs
+	cp -fr ./pkgs_agent/web/* $(DESTDIR)/usr/share/pkgs
 
 clean:
 	dh_testdir
@@ -20,7 +20,6 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
 	dh_installdirs
 
 binary-indep: build install
