@@ -47,7 +47,7 @@ cp pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py %buildroot%_sbindir/
 
 mkdir -p %buildroot%{python2_sitelib}/pulse_pkgs_agent
 cp pkgs_agent/__init__.py %buildroot%{python2_sitelib}/pulse_pkgs_agent
-cp -fr cp pkgs_agent/lib %buildroot%{python2_sitelib}/pulse_pkgs_agent
+cp -fr pkgs_agent/lib %buildroot%{python2_sitelib}/pulse_pkgs_agent
 
 mkdir -p %buildroot%_datadir/pkgs/
 cp -fr ./pkgs_agent/web/* %buildroot%_datadir/pkgs/
