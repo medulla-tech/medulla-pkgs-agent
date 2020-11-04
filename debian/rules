@@ -1,23 +1,8 @@
 #!/usr/bin/make -f
 
-# Stolen from cdbs, we need this.
-DEB_VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' ')
-DEB_NOEPOCH_VERSION := $(shell echo $(DEB_VERSION) | cut -d: -f2-)
-DEB_UPSTREAM_VERSION := $(shell echo $(DEB_NOEPOCH_VERSION) | sed 's/-[^-]*$$//')
+DESTDIR = $(CURDIR)/debian/pulse-pkgs-agent
 
-# Used during building to set the version
-export CFLAGS=-DVERSION=\"$(DEB_UPSTREAM_VERSION)\"
-
-%:
-	dh $@ --buildsystem=python_distutils --with=python2
-
-override_dh_install:
-	dh_install --list-missing
-
-override_dh_auto_build:
-	dh_auto_build
-
-override_dh_auto_install:
+build:
 	dh_auto_install
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
 	cp pkgs_agent/__init__.py $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
@@ -26,3 +11,35 @@ override_dh_auto_install:
 	cp pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py $(CURDIR)/debian/tmp/usr/sbin/
 	mkdir -p $(CURDIR)/debian/tmp/usr/share/pkgs
 	cp -fr ./pkgs_agent/web/* $(CURDIR)/debian/tmp/usr/share/pkgs
+
+clean:
+	dh_testdir
+	dh_testroot
+	-$(MAKE) clean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+binary-indep: build install
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_install
+	dh_fixperms
+	dh_installchangelogs
+	dh_installdocs
+	dh_installinit
+	# Some postinstall tools are known to fails after being stripped
+	#dh_strip
+	dh_link
+	dh_compress
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
