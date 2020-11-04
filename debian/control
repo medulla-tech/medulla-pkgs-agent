@@ -8,5 +8,5 @@ Homepage: http://www.siveo.net/
 
 Package: pulse-pkgs-agent
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, python-twisted-web, php-xmlrpc
 Description: Pulse pkgs agent
