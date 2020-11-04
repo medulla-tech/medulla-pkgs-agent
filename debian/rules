@@ -3,7 +3,6 @@
 DESTDIR = $(CURDIR)/debian/pulse-pkgs-agent
 
 build:
-	dh_auto_install
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
 	cp pkgs_agent/__init__.py $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
 	cp -fr pkgs_agent/lib $(CURDIR)/debian/tmp/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
