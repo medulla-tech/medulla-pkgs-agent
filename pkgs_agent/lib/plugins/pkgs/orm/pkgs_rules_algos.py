@@ -22,47 +22,52 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+# uses SA to handle sessions
+# file : pkgs_agent/lib/plugins/pkgs/orm/pkgs_rules_algos.py
+
 import logging
 
-""" Class to map pkgs.pkgs_ars_share to SA
+""" Class to map pkgs.pkgs_rules_algos to SA
 """
-
-class Pkgs_ars_share(object):
-    """ Mapping between pkgs.pkgs_ars_share and SA
-    colunm : 'id,hostname,jid'
+class Pkgs_rules_algos(object):
+    """ Mapping between pkgs.pkgs_rules_algos and SA
+        colunm table: ' id,name,description,level'
     """
+
     def getId(self):
         if self.id is not None:
             return self.id
         else:
             return 0
 
-    def getHostname(self):
-        if self.hostname is not None:
-            return self.hostname
+    def getName(self):
+        if self.name is not None:
+            return self.name
+        else:
+            return-1
+
+    def getDescription(self):
+        if self.description is not None:
+            return self.description
         else:
             return ""
 
-    def getJid(self):
-        if self.jid is not None:
-            return self.jid
+    def getLevel(self):
+        if self.level is not None:
+            return self.level
         else:
             return ""
 
     def to_array(self):
-        """
-        This function serialize the object to dict.
-
-        Returns:
-            Dict of elements contained into the object.
-        """
         return {
-            'id' : self.getId(),
-            'hostname': self.getHostname(),
-            'jid': self.getJid()
-        }
+            'id': self.getId(),
+            'name': self.getName(),
+            'description': self.getDescription(),
+            'level': self.getLevel()}
 
     def toH(self):
-        return {'id': self.id,
-                'hostname': self.hostname,
-                'jid': self.jid}
+        return {
+            'id': self.id,
+            'name': self.ars_share_id,
+            'description': self.packages_id,
+            'level': self.level}
