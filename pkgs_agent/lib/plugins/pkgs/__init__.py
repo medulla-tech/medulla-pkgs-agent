@@ -164,7 +164,7 @@ class PkgsDatabase(DatabaseHelper):
                 self.metadata,
                 autoload = True
             )
- 
+
             #pkgs_shares_ars_web
             self.pkgs_shares_ars_web = Table(
                 "pkgs_shares_ars_web",
@@ -222,8 +222,8 @@ class PkgsDatabase(DatabaseHelper):
         mapper(Syncthingsync, self.syncthingsync)
         mapper(Package_pending_exclusions, self.package_pending_exclusions)
         mapper(Pkgs_shares, self.pkgs_shares)
-        mapper(Pkgs_ars_share, self.pkgs_ars_share)
-        mapper(Pkgs_ars_web_shares, self.pkgs_ars_web_shares)
+        mapper(Pkgs_shares_ars, self.pkgs_shares_ars)
+        mapper(Pkgs_shares_ars_web, self.pkgs_shares_ars_web)
         mapper(Pkgs_rules_algos, self.pkgs_rules_algos)
         mapper(Pkgs_rules_global, self.pkgs_rules_global)
         mapper(Pkgs_rules_local, self.pkgs_rules_local)
@@ -622,7 +622,7 @@ class PkgsDatabase(DatabaseHelper):
                         enabled, type,
                         uri, ars_name,
                         ars_id, share_path):
-        """ 
+        """
             fild table : id,name,comments,enabled,type,uri,ars_name,ars_id,share_path
         """
         try:
@@ -643,10 +643,10 @@ class PkgsDatabase(DatabaseHelper):
 
     @DatabaseHelper._sessionm
     def SetPkgs_shares_ars( self,id,hostname,jid,pkgs_shares_id):
-    """ 
-        fild table :  id,hostname,jid,pkgs_shares_id
-        warning id is not auto increment
-    """    
+        """
+            fild table :  id,hostname,jid,pkgs_shares_id
+            warning id is not auto increment
+        """
         try:
             new_Pkgs_shares_ars = Pkgs_shares_ars()
             new_Pkgs_shares_ars.id = id
@@ -660,13 +660,13 @@ class PkgsDatabase(DatabaseHelper):
             logging.getLogger().error(str(e))
 
     @DatabaseHelper._sessionm
-    def SetPkgs_shares_ars_web( self, pkgs_share_id, 
-                               ars_share_id, packages_id, 
-                               status, finger_print, size, 
+    def SetPkgs_shares_ars_web( self, pkgs_share_id,
+                               ars_share_id, packages_id,
+                               status, finger_print, size,
                                edition_date):
-    """ 
-        fild table : id,ars_share_id,packages_id,status,finger_print,size,date_edition
-    """    
+        """
+            fild table : id,ars_share_id,packages_id,status,finger_print,size,date_edition
+        """
         try:
             new_Pkgs_shares_ars_web = Pkgs_shares_ars_web()
             new_Pkgs_shares_ars_web.ars_share_id =  ars_share_id
@@ -683,9 +683,9 @@ class PkgsDatabase(DatabaseHelper):
 
     @DatabaseHelper._sessionm
     def SetPkgs_rules_algos(self, id, name, description, level):
-    """ 
-        fild table : id,name,description,level
-    """    
+        """
+            fild table : id,name,description,level
+        """
         try:
             new_Pkgs_rules_algos = Pkgs_rules_algos()
             new_Pkgs_rules_algos.ars_share_id =  ars_share_id
@@ -699,9 +699,9 @@ class PkgsDatabase(DatabaseHelper):
 
     @DatabaseHelper._sessionm
     def SetPkgs_rules_global(self,pkgs_rules_algos_id,pkgs_shares_id,order,suject):
-    """ 
-        fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
-    """    
+        """
+            fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
+        """
         try:
             new_Pkgs_rules_global = Pkgs_rules_global()
             new_Pkgs_rules_global.ars_share_id = ars_share_id
@@ -716,9 +716,9 @@ class PkgsDatabase(DatabaseHelper):
 
     @DatabaseHelper._sessionm
     def SetPkgs_rules_local(self, pkgs_rules_algos_id,pkgs_shares_id,order,suject):
-    """ 
-        fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
-    """    
+        """
+            fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
+        """
         try:
             new_Pkgs_rules_local = Pkgs_rules_local()
             new_Pkgs_rules_local.ars_share_id = ars_share_id

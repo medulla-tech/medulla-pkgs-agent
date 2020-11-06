@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8; -*-
 # (c) 2016 Siveo, http://www.siveo.net
-# 
+#
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -34,6 +34,7 @@ import logging
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")))
 
 from lib.xml_rpc_pkgs import pkgsxmlrpc
+from lib.xml_rpc_xmppmaster import xmppmasterxmlrpc
 from lib.configuration import confParameter
 from lib.utils import writePid, cleanPid, makeSSLContext
 from lib.xml_rpc_server import TwistedRPCServer
@@ -136,7 +137,7 @@ class Apppkgs(object):
         self.opts = opts
         self.daemon = opts.deamon
         self.PIDFile = "/var/run/pkgsagent/pulse_pkgs_agent.pid"
-        
+
         # activate module.
 
         if "glpi" in self.config.plugins_list:
@@ -163,13 +164,15 @@ class Apppkgs(object):
         r = TwistedRPCServer(self.config.user,
                              self.config.password)
         pkgoobj = pkgsxmlrpc()
+        xmppoobj = xmppmasterxmlrpc()
         r.putSubHandler('pkgsf', pkgoobj)
+        r.putSubHandler('xmppf', xmppoobj)
         if self.config.enablessl:
             logger.debug("SSL Context")
             sslContext = makeSSLContext(self.config.verifypeer,
                                         self.config.cacert,
                                         self.config.localcert)
-            
+
             reactor.listenSSL(self.config.port,
                               server.Site(r),
                               interface=self.config.host,
@@ -193,7 +196,7 @@ class Apppkgs(object):
         """
         logger.info('Pkgs-agent stop...')
         cleanPid(self.PIDFile)
-    
+
     def kill(self):
         pid = self.readPid(self.PIDFile)
         if pid is None:
@@ -213,7 +216,7 @@ if __name__ == '__main__':
     elif sys.platform.startswith('win') or sys.platform.startswith('darwin') :
         print "Pulse agent must be running on ARS linux os"
         sys.exit(0)
-    
+
     optp = OptionParser()
     optp.add_option("-d",
                     "--deamon",
@@ -228,7 +231,7 @@ if __name__ == '__main__':
                     default = False,
                     help="console debug")
     optp.add_option("-f",
-                    "--inifile", 
+                    "--inifile",
                     dest="dft_inifile",
                     default=os.path.join("etc",
                                          "pulse",
@@ -251,7 +254,7 @@ if __name__ == '__main__':
                     default=False,
                     action="store_true",
                     help="Reload configuration")
-    
+
     opts, args = optp.parse_args()
     config = confParameter(opts.dft_inifile)
 
