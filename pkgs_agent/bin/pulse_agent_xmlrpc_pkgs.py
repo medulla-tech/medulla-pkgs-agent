@@ -30,8 +30,11 @@ import signal
 from resource import RLIMIT_NOFILE, RLIM_INFINITY, getrlimit
 import logging
 
+
+
+
 # directory pkgs_agent
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")))
+sys.path.append("/usr/lib/python2.7/dist-packages/pulse_pkgs_agent/")
 
 from lib.xml_rpc_pkgs import pkgsxmlrpc
 from lib.xml_rpc_xmppmaster import xmppmasterxmlrpc
