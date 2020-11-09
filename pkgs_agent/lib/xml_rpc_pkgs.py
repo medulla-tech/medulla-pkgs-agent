@@ -36,21 +36,3 @@ class pkgsxmlrpc(xmlrpc.XMLRPC):
         return "test"
     # fonction declare en rpc
     
-    
-    
-#class Example(xmlrpc.XMLRPC):
-    #"""An example object to be published."""
-
-    #def xmlrpc_echo(self, x):
-        #"""Return all passed args."""
-        #return x
-
-    #def xmlrpc_add(self, a, b):
-        #"""Return sum of arguments."""
-        #return a + b
-
-#class Date(xmlrpc.XMLRPC):
-    #"""Serve the XML-RPC 'time' method."""
-    #def xmlrpc_time(self):
-        #"""Return UNIX time."""
-        #return time.time()
