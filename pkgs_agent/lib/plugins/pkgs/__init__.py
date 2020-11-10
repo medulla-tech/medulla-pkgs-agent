@@ -618,7 +618,8 @@ class PkgsDatabase(DatabaseHelper):
     # =====================================================================
 
     @DatabaseHelper._sessionm
-    def SetPkgs_shares( self, name, comments,
+    def SetPkgs_shares( self, session,
+                        name, comments,
                         enabled, type,
                         uri, ars_name,
                         ars_id, share_path):
@@ -638,11 +639,15 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_shares)
             session.commit()
             session.flush()
+            return new_Pkgs_shares.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_shares_ars( self,id,hostname,jid,pkgs_shares_id):
+    def SetPkgs_shares_ars(self, session,
+                           id, hostname,
+                           jid, pkgs_shares_id):
         """
             fild table :  id,hostname,jid,pkgs_shares_id
             warning id is not auto increment
@@ -656,11 +661,14 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_shares_ars)
             session.commit()
             session.flush()
+            return new_Pkgs_shares_ars.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_shares_ars_web( self, pkgs_share_id,
+    def SetPkgs_shares_ars_web(self, session,
+                               pkgs_share_id,
                                ars_share_id, packages_id,
                                status, finger_print, size,
                                edition_date):
@@ -678,11 +686,15 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_shares_ars_web)
             session.commit()
             session.flush()
+            return new_Pkgs_shares_ars_web.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_rules_algos(self, id, name, description, level):
+    def SetPkgs_rules_algos(self, session,
+                            id, name,
+                            description, level):
         """
             fild table : id,name,description,level
         """
@@ -694,11 +706,16 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_rules_algos)
             session.commit()
             session.flush()
+            return new_Pkgs_rules_algos.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_rules_global(self,pkgs_rules_algos_id,pkgs_shares_id,order,suject):
+    def SetPkgs_rules_global(self, session,
+                             pkgs_rules_algos_id,
+                             pkgs_shares_id,
+                             order,suject):
         """
             fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
         """
@@ -711,11 +728,16 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_rules_global)
             session.commit()
             session.flush()
+            return new_Pkgs_rules_global.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_rules_local(self, pkgs_rules_algos_id,pkgs_shares_id,order,suject):
+    def SetPkgs_rules_local(self, session,
+                            pkgs_rules_algos_id,
+                            pkgs_shares_id,
+                            order,suject):
         """
             fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
         """
@@ -728,5 +750,7 @@ class PkgsDatabase(DatabaseHelper):
             session.add(new_Pkgs_rules_local)
             session.commit()
             session.flush()
+            return new_Pkgs_rules_local.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
