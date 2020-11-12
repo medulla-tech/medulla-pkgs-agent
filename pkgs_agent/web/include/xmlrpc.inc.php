@@ -41,4 +41,8 @@ function pkgs_xmpp_test(){
 function pkgs_pkgs_test(){
 	return xmlCall("pkgsf.test",array());
 }
+
+function pkgs_get_shares(){
+	return xmlCall("pkgsf.get_shares",array());
+}
 ?>

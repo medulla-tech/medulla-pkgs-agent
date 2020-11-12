@@ -754,3 +754,10 @@ class PkgsDatabase(DatabaseHelper):
         except Exception, e:
             logging.getLogger().error(str(e))
             return None
+
+    @DatabaseHelper._sessionm
+    def get_shares(self, session):
+        query = session.query(Pkgs_shares).all()
+
+        ret = [elem.toH() for elem in query]
+        return ret
