@@ -43,9 +43,14 @@ from lib.plugins.pkgs.orm.extensions import Extensions
 from lib.plugins.pkgs.orm.package_pending_exclusions import Package_pending_exclusions
 from lib.plugins.pkgs.orm.packages import Packages
 from lib.plugins.pkgs.orm.syncthingsync import Syncthingsync
+from lib.plugins.pkgs.orm.pkgs_rules_algos import Pkgs_rules_algos
+from lib.plugins.pkgs.orm.pkgs_rules_global import Pkgs_rules_global
+from lib.plugins.pkgs.orm.pkgs_rules_local import Pkgs_rules_local
+from lib.plugins.pkgs.orm.pkgs_shares_ars import Pkgs_shares_ars
+from lib.plugins.pkgs.orm.pkgs_shares_ars_web import Pkgs_shares_ars_web
 from lib.plugins.pkgs.orm.pkgs_shares import Pkgs_shares
-from lib.plugins.pkgs.orm.pkgs_ars_share import Pkgs_ars_share
-from lib.plugins.pkgs.orm.pkgs_ars_web_shares import Pkgs_ars_web_shares
+
+
 from lib.configuration import confParameter
 from lib.plugins.xmpp import XmppMasterDatabase
 # Imported last
@@ -160,16 +165,16 @@ class PkgsDatabase(DatabaseHelper):
                 autoload = True
             )
 
-            #pkgs_ars_web_shares
-            self.pkgs_ars_web_shares = Table(
-                "pkgs_ars_web_shares",
+            #pkgs_shares_ars_web
+            self.pkgs_shares_ars_web = Table(
+                "pkgs_shares_ars_web",
                 self.metadata,
                 autoload = True
             )
 
-            #pkgs_ars_share
-            self.pkgs_ars_share = Table(
-                "pkgs_ars_share",
+            #pkgs_shares_ars
+            self.pkgs_shares_ars = Table(
+                "pkgs_shares_ars",
                 self.metadata,
                 autoload = True
             )
@@ -177,6 +182,27 @@ class PkgsDatabase(DatabaseHelper):
             #pkgs_shares
             self.pkgs_shares = Table(
                 "pkgs_shares",
+                self.metadata,
+                autoload = True
+            )
+
+            #pkgs_rules_algos
+            self.pkgs_rules_algos = Table(
+                "pkgs_rules_algos",
+                self.metadata,
+                autoload = True
+            )
+
+            #pkgs_rules_global
+            self.pkgs_rules_global = Table(
+                "pkgs_rules_global",
+                self.metadata,
+                autoload = True
+            )
+
+            #pkgs_rules_local
+            self.pkgs_rules_local = Table(
+                "pkgs_rules_local",
                 self.metadata,
                 autoload = True
             )
@@ -196,8 +222,11 @@ class PkgsDatabase(DatabaseHelper):
         mapper(Syncthingsync, self.syncthingsync)
         mapper(Package_pending_exclusions, self.package_pending_exclusions)
         mapper(Pkgs_shares, self.pkgs_shares)
-        mapper(Pkgs_ars_share, self.pkgs_ars_share)
-        mapper(Pkgs_ars_web_shares, self.pkgs_ars_web_shares)
+        mapper(Pkgs_shares_ars, self.pkgs_shares_ars)
+        mapper(Pkgs_shares_ars_web, self.pkgs_shares_ars_web)
+        mapper(Pkgs_rules_algos, self.pkgs_rules_algos)
+        mapper(Pkgs_rules_global, self.pkgs_rules_global)
+        mapper(Pkgs_rules_local, self.pkgs_rules_local)
 
     ####################################
 
@@ -589,10 +618,14 @@ class PkgsDatabase(DatabaseHelper):
     # =====================================================================
 
     @DatabaseHelper._sessionm
-    def SetPkgs_shares( self, name, comments,
+    def SetPkgs_shares( self, session,
+                        name, comments,
                         enabled, type,
                         uri, ars_name,
-                        ars_id, path_pakage):
+                        ars_id, share_path):
+        """
+            fild table : id,name,comments,enabled,type,uri,ars_name,ars_id,share_path
+        """
         try:
             new_Pkgs_shares = Pkgs_shares()
             new_Pkgs_shares.name = name
@@ -602,41 +635,129 @@ class PkgsDatabase(DatabaseHelper):
             new_Pkgs_shares.uri = uri
             new_Pkgs_shares.ars_name = ars_name
             new_Pkgs_shares.ars_id = ars_id
-            new_Pkgs_shares.path_pakage = path_pakage
+            new_Pkgs_shares.share_path = share_path
             session.add(new_Pkgs_shares)
             session.commit()
             session.flush()
+            return new_Pkgs_shares.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_ars_share( self,id,hostname,jid)
+    def SetPkgs_shares_ars(self, session,
+                           id, hostname,
+                           jid, pkgs_shares_id):
+        """
+            fild table :  id,hostname,jid,pkgs_shares_id
+            warning id is not auto increment
+        """
         try:
-            new_Pkgs_ars_share = Pkgs_ars_share()
-            new_Pkgs_ars_share.id = id
-            new_Pkgs_ars_share.jid =  jid
-            session.add(new_Pkgs_ars_share)
+            new_Pkgs_shares_ars = Pkgs_shares_ars()
+            new_Pkgs_shares_ars.id = id
+            new_Pkgs_shares_ars.hostname =  hostname
+            new_Pkgs_shares_ars.jid =  jid
+            new_Pkgs_shares_ars.pkgs_shares_id =  pkgs_shares_id
+            session.add(new_Pkgs_shares_ars)
             session.commit()
             session.flush()
+            return new_Pkgs_shares_ars.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
 
     @DatabaseHelper._sessionm
-    def SetPkgs_ars_web_shares( self, pkgs_share_id, 
-                               ars_share_id, packages_id, 
-                               status, finger_print, size, 
-                               edition_date)
+    def SetPkgs_shares_ars_web(self, session,
+                               pkgs_share_id,
+                               ars_share_id, packages_id,
+                               status, finger_print, size,
+                               edition_date):
+        """
+            fild table : id,ars_share_id,packages_id,status,finger_print,size,date_edition
+        """
         try:
-            new_Pkgs_ars_web_shares = Pkgs_ars_web_shares()
-            new_Pkgs_ars_web_shares.pkgs_share_id = pkgs_share_id
-            new_Pkgs_ars_web_shares.ars_share_id =  ars_share_id
-            new_Pkgs_ars_web_shares.packages_id = packages_id
-            new_Pkgs_ars_web_shares.status =  status
-            new_Pkgs_ars_web_shares.finger_print =  finger_print
-            new_Pkgs_ars_web_shares.size = size
-            new_Pkgs_ars_web_shares.edition_date =  edition_date
-            session.add(new_Syncthingsync)
+            new_Pkgs_shares_ars_web = Pkgs_shares_ars_web()
+            new_Pkgs_shares_ars_web.ars_share_id =  ars_share_id
+            new_Pkgs_shares_ars_web.packages_id = packages_id
+            new_Pkgs_shares_ars_web.status =  status
+            new_Pkgs_shares_ars_web.finger_print =  finger_print
+            new_Pkgs_shares_ars_web.size = size
+            new_Pkgs_shares_ars_web.date_edition =  date_edition
+            session.add(new_Pkgs_shares_ars_web)
             session.commit()
             session.flush()
+            return new_Pkgs_shares_ars_web.id
         except Exception, e:
             logging.getLogger().error(str(e))
+            return None
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_rules_algos(self, session,
+                            id, name,
+                            description, level):
+        """
+            fild table : id,name,description,level
+        """
+        try:
+            new_Pkgs_rules_algos = Pkgs_rules_algos()
+            new_Pkgs_rules_algos.ars_share_id =  ars_share_id
+            new_Pkgs_rules_algos.packages_id = packages_id
+            new_Pkgs_rules_algos.status =  status
+            session.add(new_Pkgs_rules_algos)
+            session.commit()
+            session.flush()
+            return new_Pkgs_rules_algos.id
+        except Exception, e:
+            logging.getLogger().error(str(e))
+            return None
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_rules_global(self, session,
+                             pkgs_rules_algos_id,
+                             pkgs_shares_id,
+                             order,suject):
+        """
+            fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
+        """
+        try:
+            new_Pkgs_rules_global = Pkgs_rules_global()
+            new_Pkgs_rules_global.ars_share_id = ars_share_id
+            new_Pkgs_rules_global.packages_id = packages_id
+            new_Pkgs_rules_global.status = status
+            new_Pkgs_rules_global.finger_print = finger_print
+            session.add(new_Pkgs_rules_global)
+            session.commit()
+            session.flush()
+            return new_Pkgs_rules_global.id
+        except Exception, e:
+            logging.getLogger().error(str(e))
+            return None
+
+    @DatabaseHelper._sessionm
+    def SetPkgs_rules_local(self, session,
+                            pkgs_rules_algos_id,
+                            pkgs_shares_id,
+                            order,suject):
+        """
+            fild table : id,pkgs_rules_algos_id,pkgs_shares_id,order,suject
+        """
+        try:
+            new_Pkgs_rules_local = Pkgs_rules_local()
+            new_Pkgs_rules_local.ars_share_id = ars_share_id
+            new_Pkgs_rules_local.packages_id = packages_id
+            new_Pkgs_rules_local.status = status
+            new_Pkgs_rules_local.finger_print = finger_print
+            session.add(new_Pkgs_rules_local)
+            session.commit()
+            session.flush()
+            return new_Pkgs_rules_local.id
+        except Exception, e:
+            logging.getLogger().error(str(e))
+            return None
+
+    @DatabaseHelper._sessionm
+    def get_shares(self, session):
+        query = session.query(Pkgs_shares).all()
+
+        ret = [elem.toH() for elem in query]
+        return ret

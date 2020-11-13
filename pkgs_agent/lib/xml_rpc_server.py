@@ -42,9 +42,6 @@ class TwistedRPCServer(xmlrpc.XMLRPC):
         self._auth = (self._user !='')
         xmlrpc.XMLRPC.__init__(self)
 
-    def echo(self, x):
-        """Return all passed args."""
-        return x
 
     def xmlrpc_ping(self):
         return 'OK'
@@ -76,17 +73,41 @@ class TwistedRPCServer(xmlrpc.XMLRPC):
                     return 'Authorization Failed!'
         request.content.seek(0, 0)
         args, functionPath = xmlrpclib.loads(request.content.read())
+        s = request.getSession()
         try:
-            #function = self._getFunction(functionPath)
+            s.loggedin
+        except AttributeError:
+            s.loggedin = False
+            # Set session expire timeout
+            #s.sessionTimeout = self.config.sessiontimeout
+        if not s.loggedin:
+            logger.debug("RPC method call from unauthenticated user: %s" % functionPath + str(args))
+            # Save the first sent HTTP headers, as they contain some
+            # informations
+            #s.http_headers = request.requestHeaders.copy()
+        else:
+            logger.debug("RPC method call from user %s: %s" % (s.userid,
+                                                               functionPath + str(args)))
+        try:
             function = self.lookupProcedure(functionPath)
         except Fault, f:
             self._cbRender(f, request)
         else:
             request.setHeader("content-type", "text/xml")
             defer.maybeDeferred(function, *args).addErrback(
-                self._ebRender
+                self._ebRender, functionPath, args, request
                 ).addCallback(
                 self._cbRender, request
                 )
 
         return server.NOT_DONE_YET
+
+    def _ebRender(self, failure, functionPath, args, request):
+        logger.error("Error during render " + functionPath + ": " + failure.getTraceback())
+        # Prepare a Fault result to return
+        result = {}
+        result['faultString'] = functionPath + " " + str(args)
+        result['faultCode'] = str(failure.type) + ": " + str(failure.value) + " "
+        result['faultTraceback'] = failure.getTraceback()
+        return result
+    

@@ -21,6 +21,7 @@
 import time
 from twisted.web import xmlrpc
 import logging
+from plugins.pkgs import PkgsDatabase
 
 logger = logging.getLogger()
 
@@ -35,22 +36,7 @@ class pkgsxmlrpc(xmlrpc.XMLRPC):
         """Return text testUNIX time."""
         return "test"
     # fonction declare en rpc
-    
-    
-    
-#class Example(xmlrpc.XMLRPC):
-    #"""An example object to be published."""
 
-    #def xmlrpc_echo(self, x):
-        #"""Return all passed args."""
-        #return x
-
-    #def xmlrpc_add(self, a, b):
-        #"""Return sum of arguments."""
-        #return a + b
-
-#class Date(xmlrpc.XMLRPC):
-    #"""Serve the XML-RPC 'time' method."""
-    #def xmlrpc_time(self):
-        #"""Return UNIX time."""
-        #return time.time()
+    def xmlrpc_get_shares(self):
+        result = PkgsDatabase().get_shares()
+        return result

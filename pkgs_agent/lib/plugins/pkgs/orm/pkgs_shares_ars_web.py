@@ -24,13 +24,15 @@
 
 # uses SA to handle sessions
 
+# file : orm/pkgs_shares_ars_web.py
+
 import logging
 
-""" Class to map pkgs.pkgs_ars_web_shares to SA
+""" Class to map pkgs.pkgs_shares_ars_web to SA
 """
-class Pkgs_ars_web_shares(object):
-    """ Mapping between pkgs.pkgs_ars_web_shares and SA
-        colunm table: 'id,pkgs_share_id,ars_share_id,packages_id,status,finger_print,size,edition_date'
+class Pkgs_shares_ars_web(object):
+    """ Mapping between pkgs.pkgs_shares_ars_web and SA
+        colunm table: 'id,ars_share_id,packages_id,status,finger_print,size,date_edition'
     """
 
     def getId(self):
@@ -38,12 +40,6 @@ class Pkgs_ars_web_shares(object):
             return self.id
         else:
             return 0
-
-    def getPkgs_share_id(self):
-        if self.pkgs_share_id is not None:
-            return self.pkgs_share_id
-        else:
-            return -1
 
     def getArs_share_id(self):
         if self.ars_share_id is not None:
@@ -76,29 +72,27 @@ class Pkgs_ars_web_shares(object):
             return 0
 
     def getEdition_date(self):
-        if self.edition_date is not None:
-            return self.edition_date
+        if self.date_edition is not None:
+            return self.date_edition
         else:
             return ""
 
     def to_array(self):
         return {
             'id': self.getId(),
-            'pkgs_share_id': self.getPkgs_share_id(),
             'ars_share_id': self.getArs_share_id(),
             'packages_id': self.getPackages_id(),
             'status': self.getStatus(),
             'finger_print': self.getFinger_print(),
             'size': self.getSize(),
-            'edition_date': self.getEdition_date()}
+            'date_edition': self.getEdition_date()}
 
     def toH(self):
         return {
             'id': self.id,
-            'pkgs_share_id': self.pkgs_share_id,
             'ars_share_id': self.ars_share_id,
             'packages_id': self.packages_id,
             'status': self.status,
             'finger_print': self.finger_print,
             'size': self.size,
-            'edition_date': self.edition_date}
+            'date_edition': self.date_edition}

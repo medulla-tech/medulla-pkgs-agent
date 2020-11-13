@@ -18,19 +18,31 @@
 * You should have received a copy of the GNU General Public License
 * along with MMC; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+* file : include/xmlrpc.inc.php
 */
 
 require("callxmlrpc-ssl.php");
 
 function test($param=[]){
-  // Call element for general xmlrpc
-	return xmlCall("add", $param);
+	return xmlCall("add",$param );
 }
 
 function pkgs_time(){
-  // Call pkgsf.element for pkgs xmlrpc
-  // This function will call time from xml_rpc_pkgs script
 	return xmlCall("pkgsf.time",array());
 }
+function pkgs_list_all(){
+	return xmlCall("pkgsf.list_all",array());
+}
 
+function pkgs_xmpp_test(){
+	return xmlCall("xmppf.test",array());
+}
+
+function pkgs_pkgs_test(){
+	return xmlCall("pkgsf.test",array());
+}
+
+function pkgs_get_shares(){
+	return xmlCall("pkgsf.get_shares",array());
+}
 ?>

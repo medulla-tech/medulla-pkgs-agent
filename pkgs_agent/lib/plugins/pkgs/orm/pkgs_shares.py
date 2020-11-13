@@ -24,13 +24,15 @@
 
 # uses SA to handle sessions
 
+# file : pkgs/orm/pkgs_shares.py
+
 import logging
 
 """ Class to map pkgs.Extensions to SA
 """
 class Pkgs_shares(object):
     """ Mapping between pkgs.pkgs_shares and SA
-        colunm table :'id,name,comments,enabled,type,uri,ars_name,ars_id,path_pakage'
+        colunm table :' id,name,comments,enabled,type,uri,ars_name,ars_id,share_path'
     """
 
     def getId(self):
@@ -81,12 +83,11 @@ class Pkgs_shares(object):
         else:
             return 0
 
-    def getPath_pakage(self):
-        if self.path_pakage is not None:
-            return self.path_pakage
+    def getshare_path(self):
+        if self.share_path is not None:
+            return self.share_path
         else:
             return ""
-
 
     def to_array(self):
         return {
@@ -98,7 +99,7 @@ class Pkgs_shares(object):
             'uri': self.getUri(),
             'ars_name': self.getArs_name(),
             'Ars_id': self.getArs_id(),
-            'path_pakage': self.getPath_pakage()}
+            'share_path': self.getshare_path()}
 
     def toH(self):
         return {
@@ -110,4 +111,4 @@ class Pkgs_shares(object):
             'uri': self.uri,
             'ars_name': self.ars_name,
             'ars_id': self.ars_id,
-            'path_pakage': self.path_pakage}
+            'share_path': self.share_path}
