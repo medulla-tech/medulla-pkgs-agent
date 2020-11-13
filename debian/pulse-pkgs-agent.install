@@ -1,3 +1,4 @@
 usr/sbin/pulse_agent_xmlrpc_pkgs.py
 usr/share/pkgs/
 usr/lib/python2.*/*-packages/pulse_pkgs_agent/
+etc/pulse-pkgs-agent/pulse_agent_xmlrpc_pkgs.ini
