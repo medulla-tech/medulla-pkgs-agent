@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8; -*-
 # (c) 2016-2020 Siveo, http://www.siveo.net
 # $Id$
