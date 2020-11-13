@@ -10,6 +10,8 @@ build:
 	cp -fv pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py $(DESTDIR)/usr/sbin/
 	mkdir -p $(DESTDIR)/usr/share/pkgs
 	cp -fr ./pkgs_agent/web/* $(DESTDIR)/usr/share/pkgs
+	mkdir -p $(DESTDIR)/etc/pulse-pkgs-agent/
+	cp -fv pkgs_agent/config/pulse_agent_xmlrpc_pkgs.ini $(DESTDIR)/etc/pulse-pkgs-agent/
 
 clean:
 	dh_testdir
