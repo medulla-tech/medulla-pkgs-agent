@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8; -*-
 #
 # (c) 2016 siveo, http://www.siveo.net

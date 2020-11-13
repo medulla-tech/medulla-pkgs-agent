@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 #
 # (c) 2016-2020 siveo, http://www.siveo.net
 #
