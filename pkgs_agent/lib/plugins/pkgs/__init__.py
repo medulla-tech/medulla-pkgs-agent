@@ -845,3 +845,8 @@ class PkgsDatabase(DatabaseHelper):
                 resuldict['regexp']=y[12]
                 ret.append(resuldict)
         return ret
+
+    def get_shares(self, session):
+        query = session.query(Pkgs_shares).all()
+        ret = [elem.toH() for elem in query]
+        return ret
