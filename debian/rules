@@ -3,9 +3,9 @@
 DESTDIR=$(CURDIR)/debian/tmp
 
 build:
-	mkdir -p $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
-	cp -fv pkgs_agent/__init__.py $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
-	cp -fr pkgs_agent/lib $(DESTDIR)/usr/lib/python2.7/dist-packages/pulse_pkgs_agent
+	mkdir -p $(DESTDIR)/usr/lib/python3/dist-packages/pulse_pkgs_agent
+	cp -fv pkgs_agent/__init__.py $(DESTDIR)/usr/lib/python3/dist-packages/pulse_pkgs_agent
+	cp -fr pkgs_agent/lib $(DESTDIR)/usr/lib/python3/dist-packages/pulse_pkgs_agent
 	mkdir -p $(DESTDIR)/usr/sbin/
 	cp -fv pkgs_agent/bin/pulse_agent_xmlrpc_pkgs.py $(DESTDIR)/usr/sbin/
 	mkdir -p $(DESTDIR)/usr/share/pkgs
