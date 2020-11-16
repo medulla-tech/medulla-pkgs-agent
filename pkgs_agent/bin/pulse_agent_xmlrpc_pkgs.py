@@ -34,7 +34,7 @@ import logging
 
 
 # directory pkgs_agent
-sys.path.append("/usr/lib/python2.7/dist-packages/pulse_pkgs_agent/")
+sys.path.append("/usr/lib/python3/dist-packages/pulse_pkgs_agent/")
 
 from lib.xml_rpc_pkgs import pkgsxmlrpc
 from lib.xml_rpc_xmppmaster import xmppmasterxmlrpc
