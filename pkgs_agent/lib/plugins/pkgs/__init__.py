@@ -850,3 +850,4 @@ class PkgsDatabase(DatabaseHelper):
         query = session.query(Pkgs_shares).all()
         ret = [elem.toH() for elem in query]
         return ret
+

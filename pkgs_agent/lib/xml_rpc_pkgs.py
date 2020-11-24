@@ -40,3 +40,9 @@ class pkgsxmlrpc(xmlrpc.XMLRPC):
     def xmlrpc_get_shares(self):
         result = PkgsDatabase().get_shares()
         return result
+
+    def xmlrpc_pkgs_sharing_rule_search(self, loginname, type="local"):
+        result = PkgsDatabase().pkgs_sharing_rule_search(loginname)
+        return result
+    
+   
