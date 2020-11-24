@@ -26,7 +26,8 @@ Requires:   python-twisted-core
 %description
 Pulse XMPP Agent
 
-%files 
+%files
+%_sysconfdir/pulse-pkgs-agent/pulse_agent_xmlrpc_pkgs.ini
 %_sbindir/pulse_agent_xmlrpc_pkgs.py
 %_datadir/pkgs/
 %{python2_sitelib}/pulse_pkgs_agent
@@ -51,3 +52,6 @@ cp -fr pkgs_agent/lib %buildroot%{python2_sitelib}/pulse_pkgs_agent
 
 mkdir -p %buildroot%_datadir/pkgs/
 cp -fr ./pkgs_agent/web/* %buildroot%_datadir/pkgs/
+
+mkdir -p %buildroot%_sysconfdir/pulse-pkgs-agent/
+cp -fv pkgs_agent/config/pulse_agent_xmlrpc_pkgs.ini %buildroot%_sysconfdir/pulse-pkgs-agent/
