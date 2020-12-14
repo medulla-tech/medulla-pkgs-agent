@@ -105,3 +105,5 @@ class xmppmasterxmlrpc(xmlrpc.XMLRPC):
             for ars in result:
                 PkgsDatabase().SetPkgs_shares_ars(ars['ars_id'], ars['nameserver'], ars['jid'], new_id_share)
         return result
+
+
