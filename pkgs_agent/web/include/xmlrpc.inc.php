@@ -45,4 +45,8 @@ function pkgs_pkgs_test(){
 function pkgs_get_shares(){
 	return xmlCall("pkgsf.get_shares",array());
 }
+
+function xmpp_packages_list(){
+return xmlCall("pkgsf.xmpp_packages_list",array());
+}
 ?>

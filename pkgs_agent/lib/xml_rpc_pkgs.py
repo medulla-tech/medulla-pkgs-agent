@@ -22,6 +22,7 @@ import time
 from twisted.web import xmlrpc
 import logging
 from plugins.pkgs import PkgsDatabase
+from plugins.xmpp import XmppMasterDatabase
 
 logger = logging.getLogger()
 
@@ -44,5 +45,31 @@ class pkgsxmlrpc(xmlrpc.XMLRPC):
     def xmlrpc_pkgs_sharing_rule_search(self, loginname, type="local"):
         result = PkgsDatabase().pkgs_sharing_rule_search(loginname)
         return result
-    
-   
+
+    def xmlrpc_xmpp_packages_list(self, path):
+        """
+        Create a list of xmpp packages and return the list and the information for each of them
+        Params:
+            path string of the packages directory path
+        Returns:
+        list of packages
+        """
+
+        # path = _path_package()
+
+        # 1 - list the packages directories
+        if os.path.isdir(path):
+            list_all = os.listdir(path)
+            xmpp_list = []
+
+            for dirname in list_all:
+                # 2 - if the directory contains xmppdeploy.json
+                if os.path.isfile(os.path.join(path, dirname, 'xmppdeploy.json')) is True:
+                    # 3 - Extracts the package information and add it to the package list
+                    #json_content = json.load(file(path+'/'+dirname+'/xmppdeploy.json'))
+                    json_content = json.load(file(os.path.join(path, dirname, 'xmppdeploy.json')))
+                    json_content['info']['uuid'] = dirname;
+                    xmpp_list.append(json_content['info'])
+            return xmpp_list
+        else:
+            return []

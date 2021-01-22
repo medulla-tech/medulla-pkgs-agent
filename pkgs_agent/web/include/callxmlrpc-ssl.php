@@ -22,12 +22,8 @@
     */
     require_once("func_include.inc.php");
 
-    echo ' 
-            <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-            <link rel="stylesheet" href="/resources/demos/style.css">
-            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>';
-            
+    echo '';
+
     function xmlCall($method, $params = null) {
         $GLOBALS['message'] = "warning";
         if ( is_session_started() === FALSE ) {
@@ -43,22 +39,22 @@
             msg("terminate script on error session value","error");
         }
         $_SESSION['auth'] = base64_encode($_SESSION['user'].":".$_SESSION['password']);
-    
+
         $functrim = function($value) {return trim($value);};
         $array_ip_accept=explode ("," , $_SESSION['remoteadress']);
-        
+
         $array_ip_accept_remote = array_map($functrim, $array_ip_accept);
         //echo $_SERVER['REMOTE_ADDR'];
         if (! in_array($_SERVER['REMOTE_ADDR'], $array_ip_accept_remote)) {
             msg("terminate script on error remote ip forbiden","error");
             exit(0);
         }
-    
+
        $auth = $_SESSION['auth'];
        $request = xmlrpc_encode_request($method, $params);
-       $header = (version_compare(phpversion(), '5.2.8')) 
+       $header = (version_compare(phpversion(), '5.2.8'))
                     ? array("Content-Type: text/xml","Authorization: Basic $auth")
-                    : "Content-Type: text/xml\r\nAuthorization: Basic $auth" ; //[1] 
+                    : "Content-Type: text/xml\r\nAuthorization: Basic $auth" ; //[1]
         if ($_SESSION['enablessl']){
             $contextstruct=array(
                 "http" => array("method" => "POST",
@@ -80,7 +76,7 @@
                                 "content" => $request,));
             $uri = sprintf("http://%s:%s/",$_SESSION['host'],$_SESSION['port']);
         }
-        # creation du context    
+        # creation du context
         $context = stream_context_create($contextstruct);
         $file = @file_get_contents($uri, false, $context);
         # on recupere le code html en analisant le header de retour
@@ -118,16 +114,16 @@ class ErrorHandlingmsg {
             $str .= htmlentities($this->faultTraceback)."\n";
             $str .= '</pre>';
             $this->msg = $str;
-            
+
         $order   = array("\r\n", "\n", "\r");
         $replace = '<br />';
         $this->msg =  str_replace($order, $replace, $this->msg);
         $order   = array("\"");
         $replace = "'";
         $this->msg = str_replace($order, $replace, $this->msg);
- 
+
         echo '<script>
-//             navigator.permissions.query({name: "clipboard-write"}).then(result => { 
+//             navigator.permissions.query({name: "clipboard-write"}).then(result => {
 //                  if (result.state == "granted" || result.state == "prompt") {
 //                      console.log(" write to the clipboard now")
 //                  }
