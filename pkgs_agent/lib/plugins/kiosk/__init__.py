@@ -53,10 +53,10 @@ Session = sessionmaker()
 
 class Singleton(object):
 
-    def __new__(type, *args):
-        if '_the_instance' not in type.__dict__:
-            type._the_instance = object.__new__(type)
-        return type._the_instance
+    def __new__(cls, *args):
+        if '_the_instance' not in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
 
 class DatabaseHelper(Singleton):
     ## Session decorator to create and close session automatically
@@ -106,13 +106,11 @@ class KioskDatabase(DatabaseHelper):
         self.sessionkiosk = None
         self.config = confParameter()
         # utilisation xmppmaster
-        self.engine_kiosk_base = create_engine('mysql://%s:%s@%s:%s/%s'%( self.config.kiosk_dbuser,
-                                                                          self.config.kiosk_dbpasswd,
-                                                                          self.config.kiosk_dbhost,
-                                                                          self.config.kiosk_dbport,
-                                                                          self.config.kiosk_dbname),
-                                                                          pool_recycle = self.config.dbpoolrecycle,
-                                                                          pool_size = self.config.dbpoolsize)
+        self.engine_kiosk_base = create_engine(
+            f'mysql://{self.config.kiosk_dbuser}:{self.config.kiosk_dbpasswd}@{self.config.kiosk_dbhost}:{self.config.kiosk_dbport}/{self.config.kiosk_dbname}',
+            pool_recycle=self.config.dbpoolrecycle,
+            pool_size=self.config.dbpoolsize,
+        )
         self.Sessionkiosk = sessionmaker(bind=self.engine_kiosk_base)
         self.is_activated = True
         self.logger.debug("kiosk finish activation")
@@ -161,11 +159,7 @@ class KioskDatabase(DatabaseHelper):
             A list of all the founded entities.
         """
         ret = session.query(Profiles).all()
-        lines = []
-        for row in ret:
-            lines.append(row.toDict())
-
-        return lines
+        return [row.toDict() for row in ret]
 
     @DatabaseHelper._sessionm
     def get_profile_list_for_OUList(self, session, OU):
@@ -223,10 +217,7 @@ class KioskDatabase(DatabaseHelper):
             A list of the names for all the founded entities.
         """
         ret = session.query(Profiles.name).all()
-        lines = []
-        for row in ret:
-            lines.append(row[0])
-        return lines
+        return [row[0] for row in ret]
 
     @DatabaseHelper._sessionm
     def create_profile(self, session, name, ous, active, packages):
@@ -274,7 +265,7 @@ class KioskDatabase(DatabaseHelper):
         # Creation of the new profile
         now = time.strftime('%Y-%m-%d %H:%M:%S')
 
-        sql = """INSERT INTO `kiosk`.`profiles` VALUES('%s','%s', '%s', '%s');""" % ('0', name, active, now)
+        sql = f"""INSERT INTO `kiosk`.`profiles` VALUES('0','{name}', '{active}', '{now}');"""
 
         session.execute(sql)
         session.commit()
@@ -465,16 +456,16 @@ class KioskDatabase(DatabaseHelper):
         left join profiles on profiles.id = package_has_profil.profil_id\
         WHERE profiles.id = '%s';""" %(id)
 
-        sql_ou = """SELECT ou FROM profile_has_ous WHERE profile_id = %s"""%(id)
+        sql_ou = f"""SELECT ou FROM profile_has_ous WHERE profile_id = {id}"""
 
         response = session.execute(sql)
         result = [{'uuid':element.package_uuid, 'name':element.package_name, 'status':element.package_status} for element in response]
 
         response_ou = session.execute(sql_ou)
-        dict = {}
-
-        for column in profile.__table__.columns:
-            dict[column.name] = str(getattr(profile, column.name))
+        dict = {
+            column.name: str(getattr(profile, column.name))
+            for column in profile.__table__.columns
+        }
         dict['packages'] = result
         # generate a list for the OUs and it's added to the returned result
         dict['ous'] = [element.ou for element in response_ou]
@@ -521,7 +512,7 @@ class KioskDatabase(DatabaseHelper):
         # Update the profile
         now = time.strftime('%Y-%m-%d %H:%M:%S')
 
-        sql = """UPDATE profiles SET name='%s',active='%s' WHERE id='%s';""" % (name, active, id)
+        sql = f"""UPDATE profiles SET name='{name}',active='{active}' WHERE id='{id}';"""
 
         session.execute(sql)
         session.commit()

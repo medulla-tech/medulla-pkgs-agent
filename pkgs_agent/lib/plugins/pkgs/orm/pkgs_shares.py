@@ -36,58 +36,31 @@ class Pkgs_shares(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getName(self):
-        if self.name is not None:
-            return self.name
-        else:
-            return ""
+        return self.name if self.name is not None else ""
 
     def getComments(self):
-        if self.comments is not None:
-            return self.comments
-        else:
-            return ""
+        return self.comments if self.comments is not None else ""
 
     def getEnabled(self):
-        if self.enabled is not None:
-            return self.enabled
-        else:
-            return 0
+        return self.enabled if self.enabled is not None else 0
 
     def getType(self):
-        if self.type is not None:
-            return self.type
-        else:
-            return ""
+        return self.type if self.type is not None else ""
 
     def getUri(self):
-        if self.uri is not None:
-            return self.uri
-        else:
-            return ""
+        return self.uri if self.uri is not None else ""
 
     def getArs_name(self):
-        if self.ars_name is not None:
-            return self.ars_name
-        else:
-            return ""
+        return self.ars_name if self.ars_name is not None else ""
 
     def getArs_id(self):
-        if self.ars_id is not None:
-            return self.ars_id
-        else:
-            return 0
+        return self.ars_id if self.ars_id is not None else 0
 
     def getshare_path(self):
-        if self.share_path is not None:
-            return self.share_path
-        else:
-            return ""
+        return self.share_path if self.share_path is not None else ""
 
     def to_array(self):
         return {

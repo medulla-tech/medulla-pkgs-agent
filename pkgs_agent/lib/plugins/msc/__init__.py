@@ -58,10 +58,10 @@ NB_DB_CONN_TRY = 2
 
 class Singleton(object):
 
-    def __new__(type, *args):
-        if '_the_instance' not in type.__dict__:
-            type._the_instance = object.__new__(type)
-        return type._the_instance
+    def __new__(cls, *args):
+        if '_the_instance' not in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
 
 
 class ComputerLocationManager(Singleton):
@@ -78,23 +78,23 @@ class ComputerLocationManager(Singleton):
                 name = self.components.keys()[0]
             else:
                 raise Exception("Can't auto-select a computer location manager, please configure one in pulse2.ini.")
-        self.logger.info("Selecting computer location manager: %s" % name)
+        self.logger.info(f"Selecting computer location manager: {name}")
         self.main = name
 
     def register(self, name, klass):
-        self.logger.debug("Registering computer location manager %s / %s" % (name, str(klass)))
+        self.logger.debug(
+            f"Registering computer location manager {name} / {str(klass)}"
+        )
         self.components[name] = klass
 
     def validate(self):
         return True
 
     def displayLocalisationBar(self):
-        if self.main in self.components:
-            klass = self.components[self.main]
-            ret = klass().displayLocalisationBar()
-        else:
-            ret = False
-        return ret
+        if self.main not in self.components:
+            return False
+        klass = self.components[self.main]
+        return klass().displayLocalisationBar()
 
     def getUserProfile(self, userid):
         try:
@@ -213,15 +213,13 @@ class MscDatabase(DatabaseHelper):
         self.config = confParameter()
 
         self.session = None
-        self.engine_mscmmaster_base = create_engine('mysql://%s:%s@%s:%s/%s' % (self.config.msc_dbuser,
-                                                                                self.config.msc_dbpasswd,
-                                                                                self.config.msc_dbhost,
-                                                                                self.config.msc_dbport,
-                                                                                self.config.msc_dbname),
-                                                    pool_recycle=self.config.dbpoolrecycle,
-                                                    pool_size=self.config.dbpoolsize,
-                                                    pool_timeout=self.config.msc_dbpooltimeout,
-                                                    convert_unicode=True)
+        self.engine_mscmmaster_base = create_engine(
+            f'mysql://{self.config.msc_dbuser}:{self.config.msc_dbpasswd}@{self.config.msc_dbhost}:{self.config.msc_dbport}/{self.config.msc_dbname}',
+            pool_recycle=self.config.dbpoolrecycle,
+            pool_size=self.config.dbpoolsize,
+            pool_timeout=self.config.msc_dbpooltimeout,
+            convert_unicode=True,
+        )
 
         self.metadata = MetaData(self.engine_mscmmaster_base)
         if not self.initTables():
@@ -322,9 +320,7 @@ class MscDatabase(DatabaseHelper):
             ret = query.id
             # elif query:
         elif len(query) > 0:
-            ret = []
-            for q in query:
-                ret.append(q.id)
+            ret = [q.id for q in query]
         else:
             ret = -1
         session.close()
@@ -367,15 +363,31 @@ class MscDatabase(DatabaseHelper):
                                 sum_running,
                                 cmd_type=0):
         session = create_session()
-        obj = self.createCommand(session, package_id, start_file, parameters, files,
-                                 start_script, clean_on_success, start_date, end_date,
-                                 connect_as, creator, title, next_connection_delay,
-                                 max_connection_attempt,
-                                 maxbw, deployment_intervals,
-                                 fk_bundle, order_in_bundle, proxies, proxy_mode,
-                                 state, sum_running, cmd_type=0)
-        return obj
-        session.close()
+        return self.createCommand(
+            session,
+            package_id,
+            start_file,
+            parameters,
+            files,
+            start_script,
+            clean_on_success,
+            start_date,
+            end_date,
+            connect_as,
+            creator,
+            title,
+            next_connection_delay,
+            max_connection_attempt,
+            maxbw,
+            deployment_intervals,
+            fk_bundle,
+            order_in_bundle,
+            proxies,
+            proxy_mode,
+            state,
+            sum_running,
+            cmd_type=0,
+        )
 
     def createCommand(self, session, package_id, start_file, parameters, files,
             start_script, clean_on_success, start_date, end_date, connect_as,
@@ -427,12 +439,12 @@ class MscDatabase(DatabaseHelper):
         """
         cmd = session.query(Commands).get(cmd_id)
         if cmd:
-            self.logger.debug('Force command %s to type %s' % (cmd_id, type))
+            self.logger.debug(f'Force command {cmd_id} to type {type}')
             cmd.type = type
             session.add(cmd)
             session.flush()
             return True
-        self.logger.warn('Failed to set command %s to type %s' % (cmd, type))
+        self.logger.warn(f'Failed to set command {cmd} to type {type}')
         return False
 
     @DatabaseHelper._sessionm
@@ -443,12 +455,12 @@ class MscDatabase(DatabaseHelper):
         """
         cmd = session.query(Commands).get(cmd_id)
         if cmd:
-            self.logger.debug('Set command %s as ready' % (cmd_id))
+            self.logger.debug(f'Set command {cmd_id} as ready')
             cmd.ready = 1
             session.add(cmd)
             session.flush()
             return True
-        self.logger.warn('Failed to set command %s as ready' % (cmd))
+        self.logger.warn(f'Failed to set command {cmd} as ready')
         return False
 
 
@@ -514,23 +526,21 @@ class MscDatabase(DatabaseHelper):
         session.add(target)
         session.flush()
         session.close()
-        result = {"id": target.id,
-                  "target_macaddr": target.target_macaddr,
-                  "id_group": target.id_group,
-                  "target_uuid": target.target_uuid,
-                  "target_bcast": target.target_bcast,
-                  "target_name": target.target_name,
-                  "target_ipaddr": target.target_ipaddr,
-                  "mirrors": target.mirrors,
-                  "target_network": target.target_network}
-        return result
+        return {
+            "id": target.id,
+            "target_macaddr": target.target_macaddr,
+            "id_group": target.id_group,
+            "target_uuid": target.target_uuid,
+            "target_bcast": target.target_bcast,
+            "target_name": target.target_name,
+            "target_ipaddr": target.target_ipaddr,
+            "mirrors": target.mirrors,
+            "target_network": target.target_network,
+        }
 
     def uuidtoid(self, uuid):
         if isinstance(uuid, basestring):
-            if uuid.strip().lower().startswith("uuid"):
-                return int(uuid[4:])
-            else:
-                return int(uuid)
+            return int(uuid[4:]) if uuid.strip().lower().startswith("uuid") else int(uuid)
         else:
             return  uuid
 
@@ -556,8 +566,10 @@ class MscDatabase(DatabaseHelper):
 
     def xmpp_create_CommandsOnHostPhasedeploykiosk(self,fk_commands):
         names=['upload', 'execute', 'delete', 'inventory', 'done']
-        for indexname in range(len(names)):
-            commandsOnHostPhase = self.xmpp_create_CommandsOnHostPhasedeploy(fk_commands, names[indexname])
+        for name in names:
+            commandsOnHostPhase = self.xmpp_create_CommandsOnHostPhasedeploy(
+                fk_commands, name
+            )
         return commandsOnHostPhase
 
     def xmpp_create_CommandsOnHostPhasedeploy(self, fk_commands, name, state="ready"):
@@ -595,13 +607,18 @@ class MscDatabase(DatabaseHelper):
         """
         #datenow = datetime.datetime.now()
         session = create_session()
-        q = session.query(func.count(CommandsOnHost)).\
-            filter(and_(CommandsOnHost.fk_commands == id_command,
-                        CommandsOnHost.stage == 'ended',
-                        CommandsOnHost.current_state == 'over_timed',
-                        CommandsOnHost.start_date == start_date)).\
-                            scalar()
-        return q
+        return (
+            session.query(func.count(CommandsOnHost))
+            .filter(
+                and_(
+                    CommandsOnHost.fk_commands == id_command,
+                    CommandsOnHost.stage == 'ended',
+                    CommandsOnHost.current_state == 'over_timed',
+                    CommandsOnHost.start_date == start_date,
+                )
+            )
+            .scalar()
+        )
 
     def deployxmpponmachine(self, command_id):
         result = {}
@@ -696,18 +713,25 @@ class MscDatabase(DatabaseHelper):
                     phase.state = 'ready'"""
 
         if login:
-            sqlfilter = sqlfilter + """
+            sqlfilter += (
+                """
             AND
-                commands.creator = '%s'""" % login
+                commands.creator = '%s'"""
+                % login
+            )
 
         if filt:
-            sqlfilter = sqlfilter + """
+            sqlfilter += """
             AND
             (commands.title like %%%s%%
             OR
             commands.creator like %%%s%%
             OR
-            commands.start_date like %%%s%%)""" % (filt, filt, filt)
+            commands.start_date like %%%s%%)""" % (
+                filt,
+                filt,
+                filt,
+            )
 
         reqsql = sqlselect + sqlfilter
 
@@ -747,14 +771,15 @@ class MscDatabase(DatabaseHelper):
             AND
             """ % datenow.strftime('%Y-%m-%d %H:%M:%S')
         reqsql1 = sqlselect + sqlfilter + sqllimit + sqlgroupby + ") as tmp;"
-        result = {}
         resulta = self.session.execute(reqsql)
         resultb = self.session.execute(reqsql1)
-        sizereq = [x for x in resultb][0][0]
-        result['lentotal'] = sizereq
-        result['min'] = int(min)
-        result['nb'] = (int(max) - int(min))
-        result['tabdeploy'] = {}
+        sizereq = list(resultb)[0][0]
+        result = {
+            'lentotal': sizereq,
+            'min': int(min),
+            'nb': int(max) - int(min),
+            'tabdeploy': {},
+        }
         inventoryuuid = []
         host = []
         command = []
@@ -806,19 +831,22 @@ class MscDatabase(DatabaseHelper):
         # return informations for update table deploy xmpp
         result=[]
         for objdeploy in q:
-            resultat = {}
-            resultat['gid'] = group
-            resultat['pathpackage'] = objdeploy.Commands.package_id
-            resultat['state'] = 'ABORT DEPLOYMENT CANCELLED BY USER'
-            resultat['start'] = objdeploy.CommandsOnHost.start_date
-            resultat['end'] = objdeploy.CommandsOnHost.end_date
-            resultat['inventoryuuid'] = objdeploy.Target.target_uuid
-            resultat['host'] = objdeploy.Target.target_name
-            resultat['command'] = objdeploy.Commands.id
-            resultat['title'] = objdeploy.Commands.title
-            resultat['macadress'] = objdeploy.Target.target_macaddr
-            resultat['login'] = objdeploy.Commands.creator
-            resultat['startd'] = time.mktime(objdeploy.CommandsOnHost.start_date.timetuple())
+            resultat = {
+                'gid': group,
+                'pathpackage': objdeploy.Commands.package_id,
+                'state': 'ABORT DEPLOYMENT CANCELLED BY USER',
+                'start': objdeploy.CommandsOnHost.start_date,
+                'end': objdeploy.CommandsOnHost.end_date,
+                'inventoryuuid': objdeploy.Target.target_uuid,
+                'host': objdeploy.Target.target_name,
+                'command': objdeploy.Commands.id,
+                'title': objdeploy.Commands.title,
+                'macadress': objdeploy.Target.target_macaddr,
+                'login': objdeploy.Commands.creator,
+                'startd': time.mktime(
+                    objdeploy.CommandsOnHost.start_date.timetuple()
+                ),
+            }
             resultat['endd'] = time.mktime(objdeploy.CommandsOnHost.end_date.timetuple())
             result.append(resultat)
         for x in q:
@@ -828,12 +856,12 @@ class MscDatabase(DatabaseHelper):
             # session.query(CommandsOnHostPhase).filter(CommandsOnHostPhase.fk_commands_on_host == x.CommandsOnHost.id ).delete()
             # session.flush()
             session.query(CommandsOnHost).filter(CommandsOnHost.id == x.CommandsOnHost.id ).\
-                        update({CommandsOnHost.current_state: "done",
+                            update({CommandsOnHost.current_state: "done",
                                 CommandsOnHost.stage: "ended"
                                 })
             session.flush()
             session.query(CommandsOnHostPhase).filter(CommandsOnHostPhase.fk_commands_on_host == x.CommandsOnHost.id ).\
-                update({ CommandsOnHostPhase.state: "done"})
+                    update({ CommandsOnHostPhase.state: "done"})
             session.flush()
         session.flush()
         session.close()
@@ -969,9 +997,9 @@ class MscDatabase(DatabaseHelper):
         machine_do_deploy = {}
         self.logger.debug("select deploy machine")
         for x in q:
-            self.logger.debug("machine %s [%s] presente for deploy package %s" % (x.target_target_name,
-                                                                                  x.target_target_uuid,
-                                                                                  x.commands_package_id))
+            self.logger.debug(
+                f"machine {x.target_target_name} [{x.target_target_uuid}] presente for deploy package {x.commands_package_id}"
+            )
             deployobject = {'name': str(x.target_target_name)[:-1],
                             'pakkageid': str(x.commands_package_id),
                             'commandid':  x.commands_id,
@@ -987,9 +1015,9 @@ class MscDatabase(DatabaseHelper):
             if x.target_target_uuid not in tabmachine:
                 tabmachine.append(x.target_target_uuid)
                 # recherche machine existe pour xmpp
-                self.logger.info("deploy on machine %s [%s] -> %s" % (x.target_target_name,
-                                                                      x.target_target_uuid,
-                                                                      x.commands_package_id))
+                self.logger.info(
+                    f"deploy on machine {x.target_target_name} [{x.target_target_uuid}] -> {x.commands_package_id}"
+                )
                 machine_do_deploy[x.target_target_uuid] = x.commands_package_id
                 updatemachine.append(deployobject)
                 sql ="""UPDATE `msc`.`commands_on_host`
@@ -1011,7 +1039,7 @@ class MscDatabase(DatabaseHelper):
                 session.flush()
             else:
                 self.logger.warn("Cancel deploy in process\n"\
-                                 "Deploy on machine %s [%s] -> %s" % (x.target_target_name,
+                                     "Deploy on machine %s [%s] -> %s" % (x.target_target_name,
                                                                       x.target_target_uuid,
                                                                       x.commands_package_id))
                 listemachine.append(deployobject)
@@ -1093,14 +1121,13 @@ class MscDatabase(DatabaseHelper):
             cohs = cohs.select_from(self.commands_on_host)
             cohs = cohs.filter(self.commands_on_host.c.fk_commands == cmd.id)
 
-            ok = self._deleteCommandsOnHost(session, cohs)
-            if ok:
+            if ok := self._deleteCommandsOnHost(session, cohs):
                 session.delete(cmd)
                 session.flush()
-                self.logger.info("Command (id=%s) successfully deleted" % (cmd.id))
+                self.logger.info(f"Command (id={cmd.id}) successfully deleted")
 
             else:
-                self.logger.warn("Unable to delete commands on host of command (id=%s)" % cmd.id)
+                self.logger.warn(f"Unable to delete commands on host of command (id={cmd.id})")
                 return False
 
         return True
@@ -1163,8 +1190,7 @@ class MscDatabase(DatabaseHelper):
         @type end_date: str
         """
         session = create_session()
-        cmd = session.query(Commands).get(cmd_id)
-        if cmd :
+        if cmd := session.query(Commands).get(cmd_id):
             cmd.start_date = start_date
             cmd.end_date = end_date
             cmd.sum_running = cmd.sum_failed
@@ -1173,7 +1199,9 @@ class MscDatabase(DatabaseHelper):
             session.flush()
 
             self._extendCommandsOnHost(session, cmd_id, start_date, end_date)
-            self.logger.info("msc: re-scheduling command id = <%s> from %s to %s" % (cmd_id, start_date, end_date))
+            self.logger.info(
+                f"msc: re-scheduling command id = <{cmd_id}> from {start_date} to {end_date}"
+            )
 
 
         session.close()
@@ -1233,9 +1261,7 @@ class MscDatabase(DatabaseHelper):
 
         if isinstance(cohs, int):
             cohs = [cohs]
-        elif isinstance(cohs, list):
-            pass
-        else :
+        elif not isinstance(cohs, list):
             raise TypeError("list or int type required")
         phases_values = []
         for coh in cohs :
@@ -1251,7 +1277,7 @@ class MscDatabase(DatabaseHelper):
                 if name == "upload" and len(files) == 0:
                     continue
                 if name == "execute" and (start_script == "disable" \
-                        or is_quick_action) and do_windows_update == "disable":
+                            or is_quick_action) and do_windows_update == "disable":
                     continue
                 if name == "wu_parse" and do_windows_update == "disable":
                     continue
@@ -1276,7 +1302,7 @@ class MscDatabase(DatabaseHelper):
                              target_name, cmd_max_connection_attempt,
                              start_date, end_date, scheduler=None,
                              order_in_proxy=None, max_clients_per_proxy=0):
-        logging.getLogger().debug("Create new command on host '%s'" % target_name)
+        logging.getLogger().debug(f"Create new command on host '{target_name}'")
         return {"host": target_name,
                 "start_date": start_date,
                 "end_date": end_date,
@@ -1299,15 +1325,16 @@ class MscDatabase(DatabaseHelper):
         Inject a new Target object in our MSC database
         Return the corresponding Target object
         """
-        target = {"target_name": targetName,
-                  "target_uuid": targetUuid,
-                  "target_ipaddr": targetIp,
-                  "target_macaddr": targetMac,
-                  "target_bcast": targetBCast,
-                  "target_network": targetNetmask,
-                  "mirrors": mirror,
-                  "id_group": groupID}
-        return target
+        return {
+            "target_name": targetName,
+            "target_uuid": targetUuid,
+            "target_ipaddr": targetIp,
+            "target_macaddr": targetMac,
+            "target_bcast": targetBCast,
+            "target_network": targetNetmask,
+            "mirrors": mirror,
+            "id_group": groupID,
+        }
 
     def getCommandsonhostsAndSchedulersOnBundle(self, fk_bundle):
         """
@@ -1447,7 +1474,12 @@ class MscDatabase(DatabaseHelper):
         # the join in itself is useless here, but we want to have exactly
         # the same result as in getAllCommandsonhostByCurrentstate
         if filt != '':
-            ret = ret.filter(or_(self.commands_on_host.c.host.like('%'+filt+'%'), self.commands.c.title.like('%'+filt+'%')))
+            ret = ret.filter(
+                or_(
+                    self.commands_on_host.c.host.like(f'%{filt}%'),
+                    self.commands.c.title.like(f'%{filt}%'),
+                )
+            )
         c = ret.count()
         session.close()
         return c
@@ -1462,7 +1494,12 @@ class MscDatabase(DatabaseHelper):
         else:
             ret = ret.filter(self.commands_on_host.c.current_state == current_state)
         if filt != '':
-            ret = ret.filter(or_(self.commands_on_host.c.host.like('%'+filt+'%'), self.commands.c.title.like('%'+filt+'%')))
+            ret = ret.filter(
+                or_(
+                    self.commands_on_host.c.host.like(f'%{filt}%'),
+                    self.commands.c.title.like(f'%{filt}%'),
+                )
+            )
         ret = ret.order_by(desc(self.commands_on_host.c.id))
         ret = ret.offset(int(min))
         ret = ret.limit(int(max)-int(min))
@@ -1479,7 +1516,12 @@ class MscDatabase(DatabaseHelper):
         session = create_session()
         ret = self.__queryAllCommandsonhostBy(session, ctx)
         if filt != '':
-            ret = ret.filter(or_(self.commands_on_host.c.host.like('%' + filt + '%'), self.commands.c.title.like('%' + filt + '%')))
+            ret = ret.filter(
+                or_(
+                    self.commands_on_host.c.host.like(f'%{filt}%'),
+                    self.commands.c.title.like(f'%{filt}%'),
+                )
+            )
         if int(type) == 0:  # all
             pass
         elif int(type) == 1:  # pending
@@ -1496,7 +1538,12 @@ class MscDatabase(DatabaseHelper):
         session = create_session()
         ret = self.__queryAllCommandsonhostBy(session, ctx)
         if filt != '':
-            ret = ret.filter(or_(self.commands_on_host.c.host.like('%' + filt + '%'), self.commands.c.title.like('%' + filt + '%')))
+            ret = ret.filter(
+                or_(
+                    self.commands_on_host.c.host.like(f'%{filt}%'),
+                    self.commands.c.title.like(f'%{filt}%'),
+                )
+            )
         if int(type) == 0:  # all
             pass
         elif int(type) == 1:  # pending
@@ -1522,7 +1569,7 @@ class MscDatabase(DatabaseHelper):
         ret = session.query(CommandsOnHost).select_from(self.commands_on_host.join(self.commands).join(self.target)).filter(self.target.c.target_uuid == uuid).filter(self.commands.c.creator == ctx.userid).filter(self.commands.c.fk_bundle == fk_bundle)
         # ret = ret.filter(self.commands_on_host.c.id == self.target.c.fk_commands_on_host)
         if filt != '':
-            ret = ret.filter(self.commands.c.title.like('%' + filt + '%'))
+            ret = ret.filter(self.commands.c.title.like(f'%{filt}%'))
         if history:
             ret = ret.filter(self.commands_on_host.c.current_state == 'done')
         else:
@@ -1536,11 +1583,13 @@ class MscDatabase(DatabaseHelper):
             session = create_session()
             ret = session.query(CommandsOnHost).select_from(self.commands_on_host.join(self.commands).join(self.target)).filter(self.target.c.target_uuid == uuid)
             if filt != '':
-                ret = ret.filter(self.commands.c.title.like('%' + filt + '%'))
+                ret = ret.filter(self.commands.c.title.like(f'%{filt}%'))
             c = ret.count()
             session.close()
             return c
-        self.logger.warn("User %s does not have good permissions to access '%s'" % (ctx.userid, uuid))
+        self.logger.warn(
+            f"User {ctx.userid} does not have good permissions to access '{uuid}'"
+        )
         return False
 
     def getAllCommandsOnHost(self, ctx, uuid, min, max, filt):
@@ -1549,14 +1598,16 @@ class MscDatabase(DatabaseHelper):
             query = session.query(Commands).add_column(self.commands_on_host.c.id).add_column(self.commands_on_host.c.current_state)
             query = query.select_from(self.commands.join(self.commands_on_host).join(self.target)).filter(self.target.c.target_uuid == uuid)
             if filt != '':
-                query = query.filter(self.commands.c.title.like('%' + filt + '%'))
+                query = query.filter(self.commands.c.title.like(f'%{filt}%'))
             query = query.order_by(asc(self.commands_on_host.c.next_launch_date))
             query = query.offset(int(min))
             query = query.limit(int(max) - int(min))
             ret = query.all()
             session.close()
             return map(lambda x: (x[0].toH(), x[1], x[2]), ret)
-        self.logger.warn("User %s does not have good permissions to access '%s'" % (ctx.userid, uuid))
+        self.logger.warn(
+            f"User {ctx.userid} does not have good permissions to access '{uuid}'"
+        )
         return []
 
     def getAllCommandsConsult(self, ctx, min, max, filt, expired=True):
@@ -1592,8 +1643,8 @@ class MscDatabase(DatabaseHelper):
 
         query = session.query(func.count(distinct(Commands.id)))
         query = query.select_from(self.commands.join(self.commands_on_host, self.commands_on_host.c.fk_commands == self.commands.c.id)\
-                    .join(self.target, self.commands_on_host.c.fk_target == self.target.c.id)\
-                    .outerjoin(self.bundle, self.commands.c.fk_bundle == self.bundle.c.id))
+                        .join(self.target, self.commands_on_host.c.fk_target == self.target.c.id)\
+                        .outerjoin(self.bundle, self.commands.c.fk_bundle == self.bundle.c.id))
         # Filtering on filters
         query = query.filter(filters)
         # Grouping bundle commands by fk_bundle only if fk_bundle is not null
@@ -1608,9 +1659,9 @@ class MscDatabase(DatabaseHelper):
         query = query.add_column(self.target.c.id_group).add_column(self.bundle.c.title).add_column(self.target.c.target_uuid)
         query = query.add_column(self.pull_targets.c.target_uuid)
         query = query.select_from(self.commands.join(self.commands_on_host, self.commands_on_host.c.fk_commands == self.commands.c.id)\
-                    .join(self.target, self.commands_on_host.c.fk_target == self.target.c.id)\
-                    .outerjoin(self.bundle, self.commands.c.fk_bundle == self.bundle.c.id)) \
-                    .outerjoin(self.pull_targets, self.target.c.target_uuid == self.pull_targets.c.target_uuid)
+                        .join(self.target, self.commands_on_host.c.fk_target == self.target.c.id)\
+                        .outerjoin(self.bundle, self.commands.c.fk_bundle == self.bundle.c.id)) \
+                        .outerjoin(self.pull_targets, self.target.c.target_uuid == self.pull_targets.c.target_uuid)
         # Filtering on filters
         query = query.filter(filters)
         # Grouping bundle commands by fk_bundle only if fk_bundle is not null
@@ -1624,66 +1675,30 @@ class MscDatabase(DatabaseHelper):
 
         ret = []
         for cmd, bid, target_name, cohid, gid, btitle, target_uuid, machine_pull in cmds:
-            if bid is not None:  # we are in a bundle
+            if bid is None:  # we are not in a bundle
                 if gid is not None and gid != '':
-                    ret.append({'title': btitle,
-                                'creator': cmd.creator,
-                                'creation_date': cmd.creation_date,
-                                'start_date': cmd.start_date,
-                                'end_date': cmd.end_date,
-                                'sum_running': cmd.sum_running,
-                                'sum_failed': cmd.sum_failed,
-                                'sum_done': cmd.sum_done,
-                                'sum_stopped': cmd.sum_stopped,
-                                'sum_overtimed': cmd.sum_overtimed,
-                                'bid': bid,
-                                'cmdid': '',
-                                'target': 'group %s' % gid,
-                                'gid': gid,
-                                'uuid': '',
-                                'machine_pull': machine_pull,
-                                'deployment_intervals': cmd.deployment_intervals
-                                })
-                else:
-                    ret.append({'title': btitle,
-                                'creator': cmd.creator,
-                                'creation_date': cmd.creation_date,
-                                'start_date': cmd.start_date,
-                                'end_date': cmd.end_date,
-                                'sum_running': cmd.sum_running,
-                                'sum_failed': cmd.sum_failed,
-                                'sum_done': cmd.sum_done,
-                                'sum_stopped': cmd.sum_stopped,
-                                'sum_overtimed': cmd.sum_overtimed,
-                                'bid': bid,
-                                'cmdid': '',
-                                'target': target_name,
-                                'uuid': target_uuid,
-                                'machine_pull': machine_pull,
-                                'gid': '',
-                                'deployment_intervals': cmd.deployment_intervals
-                                })
-            else:  # we are not in a bundle
-                if gid is not None and gid != '':
-                    ret.append({'title': cmd.title,
-                                'creator': cmd.creator,
-                                'creation_date': cmd.creation_date,
-                                'start_date': cmd.start_date,
-                                'end_date': cmd.end_date,
-                                'sum_running': cmd.sum_running,
-                                'sum_failed': cmd.sum_failed,
-                                'sum_done': cmd.sum_done,
-                                'sum_stopped': cmd.sum_stopped,
-                                'sum_overtimed': cmd.sum_overtimed,
-                                'bid': '',
-                                'cmdid': cmd.id,
-                                'target': 'group %s' % gid,
-                                'gid': gid,
-                                'uuid': '',
-                                'machine_pull': machine_pull,
-                                'deployment_intervals': cmd.deployment_intervals,
-                                'type': cmd.type
-                                })
+                    ret.append(
+                        {
+                            'title': cmd.title,
+                            'creator': cmd.creator,
+                            'creation_date': cmd.creation_date,
+                            'start_date': cmd.start_date,
+                            'end_date': cmd.end_date,
+                            'sum_running': cmd.sum_running,
+                            'sum_failed': cmd.sum_failed,
+                            'sum_done': cmd.sum_done,
+                            'sum_stopped': cmd.sum_stopped,
+                            'sum_overtimed': cmd.sum_overtimed,
+                            'bid': '',
+                            'cmdid': cmd.id,
+                            'target': f'group {gid}',
+                            'gid': gid,
+                            'uuid': '',
+                            'machine_pull': machine_pull,
+                            'deployment_intervals': cmd.deployment_intervals,
+                            'type': cmd.type,
+                        }
+                    )
                 else:
                     ret.append({'title': cmd.title,
                                 'creator': cmd.creator,
@@ -1707,6 +1722,47 @@ class MscDatabase(DatabaseHelper):
                                 'type': cmd.type
                                 })
 
+            elif gid is not None and gid != '':
+                ret.append(
+                    {
+                        'title': btitle,
+                        'creator': cmd.creator,
+                        'creation_date': cmd.creation_date,
+                        'start_date': cmd.start_date,
+                        'end_date': cmd.end_date,
+                        'sum_running': cmd.sum_running,
+                        'sum_failed': cmd.sum_failed,
+                        'sum_done': cmd.sum_done,
+                        'sum_stopped': cmd.sum_stopped,
+                        'sum_overtimed': cmd.sum_overtimed,
+                        'bid': bid,
+                        'cmdid': '',
+                        'target': f'group {gid}',
+                        'gid': gid,
+                        'uuid': '',
+                        'machine_pull': machine_pull,
+                        'deployment_intervals': cmd.deployment_intervals,
+                    }
+                )
+            else:
+                ret.append({'title': btitle,
+                            'creator': cmd.creator,
+                            'creation_date': cmd.creation_date,
+                            'start_date': cmd.start_date,
+                            'end_date': cmd.end_date,
+                            'sum_running': cmd.sum_running,
+                            'sum_failed': cmd.sum_failed,
+                            'sum_done': cmd.sum_done,
+                            'sum_stopped': cmd.sum_stopped,
+                            'sum_overtimed': cmd.sum_overtimed,
+                            'bid': bid,
+                            'cmdid': '',
+                            'target': target_name,
+                            'uuid': target_uuid,
+                            'machine_pull': machine_pull,
+                            'gid': '',
+                            'deployment_intervals': cmd.deployment_intervals
+                            })
         return [size, ret]
 
     def __displayLogsQuery(self, ctx, params, session):
@@ -1718,14 +1774,6 @@ class MscDatabase(DatabaseHelper):
             query = query.filter(self.target.c.target_uuid == params['uuid'])
         if params['filt'] is not None:
             query = query.filter(self.commands.c.title.like('%' + params['filt'] + '%'))
-        # if params['finished']:
-        # query = query.filter(self.commands_on_host.c.current_state.in_(['done', 'failed', 'over_timed']))
-        else:
-            # If we are querying on a bundle, we also want to display the
-            # commands_on_host flagged as done
-            # if params['b_id'] is None:
-            # query = query.filter(not_(self.commands_on_host.c.current_state.in_(['done', 'failed', 'over_timed'])))
-            pass
         query = self.__queryUsersFilter(ctx, query)
 
         # Finished param
@@ -1746,9 +1794,7 @@ class MscDatabase(DatabaseHelper):
         # filter.append(not_(self.commands_on_host.c.current_state.in_(['done', 'failed', 'over_timed'])))
         query = query.filter(and_(*filter))
         how_much = query.count()
-        if how_much > 0:
-            return False
-        return True
+        return how_much <= 0
 
     def __displayLogsQuery2(self, ctx, params, session, count=False):
         nowsystem = time.strftime("%Y-%m-%d %H:%M:%S")

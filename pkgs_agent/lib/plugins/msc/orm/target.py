@@ -53,10 +53,10 @@ class Target(object):
         return self.target_name
 
     def getShortName(self):
-        try :
+        try:
             return self.target_name.split(".")[0]
-        except :
-            logging.getLogger().warn("Unable to get shortname from '%s'" % self.target_name)
+        except:
+            logging.getLogger().warn(f"Unable to get shortname from '{self.target_name}'")
             return self.target_name
 
     def getIps(self):
@@ -80,7 +80,7 @@ class Target(object):
         mac_len = reduce(lambda x,y: x+y, map(lambda x: len(x), self.getMacs()))
         bcast_len = reduce(lambda x,y: x+y, map(lambda x: len(x), self.getBCast()))
         result = (mac_len > 0 ) and (bcast_len > 0)
-        logging.getLogger().debug("hasEnoughInfoToWOL(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"hasEnoughInfoToWOL(#{self.id}): {result}")
         return result
 
     def hasEnoughInfoToConnect(self):
@@ -91,7 +91,7 @@ class Target(object):
         ips_len = reduce(lambda x,y: x+y, map(lambda x: len(x), self.getIps()))
         names_len = len(self.getFQDN())
         result = (ips_len > 0 ) or (names_len > 0)
-        logging.getLogger().debug("hasEnoughInfoToConnect(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"hasEnoughInfoToConnect(#{self.id}): {result}")
         return result
 
     def hasFileMirror(self):

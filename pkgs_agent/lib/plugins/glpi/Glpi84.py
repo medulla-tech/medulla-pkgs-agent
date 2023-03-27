@@ -61,10 +61,10 @@ from lib.plugins.xmpp import XmppMasterDatabase
 
 class Singleton(object):
 
-    def __new__(type, *args):
-        if '_the_instance' not in type.__dict__:
-            type._the_instance = object.__new__(type)
-        return type._the_instance
+    def __new__(cls, *args):
+        if '_the_instance' not in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
 
 class DatabaseHelper(Singleton):
         ## Session decorator to create and close session automatically
@@ -118,8 +118,12 @@ class DatabaseHelper(Singleton):
                     query = query.filter(*clauses)
             # Like filters
             if 'like_filters' in params and params['like_filters']:
-                clauses = [_entity_descriptor(query._mapper_zero(), key).like('%' + value + '%')
-                    for key, value in params['like_filters'].iteritems()]
+                clauses = [
+                    _entity_descriptor(query._mapper_zero(), key).like(
+                        f'%{value}%'
+                    )
+                    for key, value in params['like_filters'].iteritems()
+                ]
                 if clauses:
                     query = query.filter(*clauses)
 
@@ -127,7 +131,7 @@ class DatabaseHelper(Singleton):
             primary_id = _entity_descriptor(query._mapper_zero(), "id")
             count = query.with_entities(func.count(primary_id))
             # Scalar doesn't work if multiple entities are selected
-            count = sum([c[0] for c in count.all()])
+            count = sum(c[0] for c in count.all())
 
             # Applying limit and offset
             if 'max' in params and 'min' in params:
@@ -151,7 +155,7 @@ class DatabaseHelper(Singleton):
                         else:
                             if item.__class__.__name__ == 'Decimal':
                                 item = int(item)
-                            line_.update({columns[i]['name'].encode('ascii', 'ignore') : item})
+                            line_[columns[i]['name'].encode('ascii', 'ignore')] = item
                     data.append(line_)
                 else:
                     if line.__class__.__name__ == 'Decimal':
@@ -191,17 +195,14 @@ class Glpi84(DatabaseHelper):
         self._glpi_version = "0.84"
 
         #utilisation glpi base
-        self.engine_glpi = create_engine('mysql://%s:%s@%s:%s/%s'%( self.config.glpi_dbuser,
-            self.config.glpi_dbpasswd,
-            self.config.glpi_dbhost,
-            self.config.glpi_dbport,
-            self.config.glpi_dbname),
-            pool_recycle = self.config.dbpoolrecycle,
-            pool_size = self.config.dbpoolsize
+        self.engine_glpi = create_engine(
+            f'mysql://{self.config.glpi_dbuser}:{self.config.glpi_dbpasswd}@{self.config.glpi_dbhost}:{self.config.glpi_dbport}/{self.config.glpi_dbname}',
+            pool_recycle=self.config.dbpoolrecycle,
+            pool_size=self.config.dbpoolsize,
         )
         self.metadata = MetaData(self.engine_glpi)
         self.initMappers()
-        self.logger.info("Glpi is in version %s" % (self.glpi_version))
+        self.logger.info(f"Glpi is in version {self.glpi_version}")
         self.metadata.create_all()
         logging.getLogger().debug('Trying to detect if GLPI version is higher than 0.84')
         self.is_activated = True
@@ -212,13 +213,11 @@ class Glpi84(DatabaseHelper):
         function to see if that glpi database backend is the one we need to use
         """
         self.config = config
-        self.db = create_engine('mysql://%s:%s@%s:%s/%s'%( self.config.glpi_dbuser,
-            self.config.glpi_dbpasswd,
-            self.config.glpi_dbhost,
-            self.config.glpi_dbport,
-            self.config.glpi_dbname),
-            pool_recycle = self.config.dbpoolrecycle,
-            pool_size = self.config.dbpoolsize)
+        self.db = create_engine(
+            f'mysql://{self.config.glpi_dbuser}:{self.config.glpi_dbpasswd}@{self.config.glpi_dbhost}:{self.config.glpi_dbport}/{self.config.glpi_dbname}',
+            pool_recycle=self.config.dbpoolrecycle,
+            pool_size=self.config.dbpoolsize,
+        )
 
         logging.getLogger().debug('Trying to detect if GLPI version is higher than 0.84')
         try:
@@ -227,7 +226,7 @@ class Glpi84(DatabaseHelper):
         except OperationalError:
             self._glpi_version = self.db.execute('SELECT value FROM glpi_configs WHERE name = "version"').fetchone().values()[0].replace(' ', '')
             if LooseVersion(self._glpi_version) >= LooseVersion('0.84') and LooseVersion(self._glpi_version):
-                logging.getLogger().debug('GLPI version %s found !' % self._glpi_version)
+                logging.getLogger().debug(f'GLPI version {self._glpi_version} found !')
                 return True
             else:
                 logging.getLogger().debug('GLPI higher than version 0.84 was not detected')
@@ -572,30 +571,27 @@ class Glpi84(DatabaseHelper):
         The request is in OR not in AND, so be carefull with what you want
         """
         ret = self.__filter_on_filter(query)
-        if type(ret) == type(None):
-            return query
-        else:
-            return query.filter(ret)
+        return query if type(ret) == type(None) else query.filter(ret)
 
     def __filter_on_filter(self, query):
         if self.config.filter_on is not None:
             a_filter_on = []
             for filter_key, filter_values in self.config.filter_on.items():
                 if filter_key == 'state':
-                    self.logger.debug('will filter %s in (%s)' % (filter_key, str(filter_values)))
+                    self.logger.debug(f'will filter {filter_key} in ({str(filter_values)})')
                     a_filter_on.append(self.machine.c.states_id.in_(filter_values))
                 if filter_key == 'type':
-                    self.logger.debug('will filter %s in (%s)' % (filter_key, str(filter_values)))
+                    self.logger.debug(f'will filter {filter_key} in ({str(filter_values)})')
                     a_filter_on.append(self.machine.c.computertypes_id.in_(filter_values))
                 if filter_key == 'entity':
-                    self.logger.debug('will filter %s in (%s)' % (filter_key, str(filter_values)))
+                    self.logger.debug(f'will filter {filter_key} in ({str(filter_values)})')
                     a_filter_on.append(self.machine.c.entities_id.in_(filter_values))
                 if filter_key == 'autoupdatesystems_id':
-                    self.logger.debug('will filter %s in (%s)' % (filter_key, str(filter_values)))
+                    self.logger.debug(f'will filter {filter_key} in ({str(filter_values)})')
                     a_filter_on.append(self.machine.c.autoupdatesystems_id.in_(filter_values))
-                if filter_key not in ('state','type','entity','autoupdatesystems_id') :
-                    self.logger.warn('dont know how to filter on %s' % (filter_key))
-            if len(a_filter_on) == 0:
+                if filter_key not in ('state','type','entity','autoupdatesystems_id'):
+                    self.logger.warn(f'dont know how to filter on {filter_key}')
+            if not a_filter_on:
                 return None
             elif len(a_filter_on) == 1:
                 return a_filter_on[0]
@@ -629,7 +625,11 @@ class Glpi84(DatabaseHelper):
             ret["computerpresence"] = ["computerpresence","xmppmaster",filt["computerpresence"] , listid]
         elif "query" in filt and filt['query'][0] == "AND":
             for q in filt['query'][1]:
-                if len(q) >=3 and (q[2] == "Online computer" or q[2] == "OU user" or q[2] == "OU machine"):
+                if len(q) >= 3 and q[2] in [
+                    "Online computer",
+                    "OU user",
+                    "OU machine",
+                ]:
                     listid = XmppMasterDatabase().getxmppmasterfilterforglpi(q)
                     ret[q[2]] = [q[1], q[2], q[3], listid]
         return ret

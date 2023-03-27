@@ -35,28 +35,16 @@ class Pkgs_rules_algos(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getName(self):
-        if self.name is not None:
-            return self.name
-        else:
-            return-1
+        return self.name if self.name is not None else -1
 
     def getDescription(self):
-        if self.description is not None:
-            return self.description
-        else:
-            return ""
+        return self.description if self.description is not None else ""
 
     def getLevel(self):
-        if self.level is not None:
-            return self.level
-        else:
-            return ""
+        return self.level if self.level is not None else ""
 
     def to_array(self):
         return {

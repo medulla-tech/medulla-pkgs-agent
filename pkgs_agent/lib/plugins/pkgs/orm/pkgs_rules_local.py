@@ -35,34 +35,19 @@ class Pkgs_rules_local(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getRules_algos_id(self):
-        if self.pkgs_rules_algos_id is not None:
-            return self.pkgs_rules_algos_id
-        else:
-            return-1
+        return self.pkgs_rules_algos_id if self.pkgs_rules_algos_id is not None else -1
 
     def getShares_id(self):
-        if self.pkgs_shares_id is not None:
-            return self.pkgs_shares_id
-        else:
-            return ""
+        return self.pkgs_shares_id if self.pkgs_shares_id is not None else ""
 
     def getOrder(self):
-        if self.order is not None:
-            return self.order
-        else:
-            return ""
+        return self.order if self.order is not None else ""
 
     def getSuject(self):
-        if self.suject is not None:
-            return self.suject
-        else:
-            return ""
+        return self.suject if self.suject is not None else ""
 
     def to_array(self):
         return {

@@ -31,22 +31,13 @@ class Dependencies(object):
     """ Mapping between msc.bundle and SA
     """
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getUuid_package(self):
-        if self.uuid_package is not None:
-            return self.uuid_package
-        else:
-            return ""
+        return self.uuid_package if self.uuid_package is not None else ""
 
     def getUuid_dependency(self):
-        if self.uuid_dependency is not None:
-            return self.uuid_dependency
-        else:
-            return ""
+        return self.uuid_dependency if self.uuid_dependency is not None else ""
 
     def to_array(self):
         """

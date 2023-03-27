@@ -33,70 +33,37 @@ class Extensions(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getRule_order(self):
-        if self.rule_order is not None:
-            return self.rule_order
-        else:
-            return 0
+        return self.rule_order if self.rule_order is not None else 0
 
     def getRule_name(self):
-        if self.rule_name is not None:
-            return self.rule_name
-        else:
-            return ""
+        return self.rule_name if self.rule_name is not None else ""
 
     def getName(self):
-        if self.name is not None:
-            return self.name
-        else:
-            return ""
+        return self.name if self.name is not None else ""
 
     def getExtension(self):
-        if self.extension is not None:
-            return self.extension
-        else:
-            return ""
+        return self.extension if self.extension is not None else ""
 
     def getMagic_command(self):
-        if self.magic_command is not None:
-            return self.magic_command
-        else:
-            return ""
+        return self.magic_command if self.magic_command is not None else ""
 
     def getBang(self):
-        if self.bang is not None:
-            return self.bang
-        else:
-            return ""
+        return self.bang if self.bang is not None else ""
 
     def getFile(self):
-        if self.file is not None:
-            return self.file
-        else:
-            return ""
+        return self.file if self.file is not None else ""
 
     def getStrings(self):
-        if self.strings is not None:
-            return self.strings
-        else:
-            return ""
+        return self.strings if self.strings is not None else ""
 
     def getProposition(self):
-        if self.proposition is not None:
-            return self.proposition
-        else:
-            return ""
+        return self.proposition if self.proposition is not None else ""
 
     def getDescription(self):
-        if self.description is not None:
-            return self.description
-        else:
-            return ""
+        return self.description if self.description is not None else ""
 
     def to_array(self):
         return {
