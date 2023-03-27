@@ -66,27 +66,26 @@ class xmppmasterxmlrpc(xmlrpc.XMLRPC):
         # list des ars en fonction des clusters
         listearsforsharelocal = [int(x['ars_id']) for x in result]
         if not listearsforsharelocal:
-            raise xmlrpc_function_xmppmaster("aucun ars trouve associe a la list des clusters suivants %s" % list_cluster_id,
-                                             "xmlrpc_share_local_initialisation")
+            raise xmlrpc_function_xmppmaster(
+                f"aucun ars trouve associe a la list des clusters suivants {list_cluster_id}",
+                "xmlrpc_share_local_initialisation",
+            )
         # recuperation de la liste des id des ars.
-        if id_ars_electing  not in [ None, ""]:
-            # on verify que id fourni et bien dans notre liste ars du partage.
-            if id_ars_electing in listearsforsharelocal:
-                idchoise = id_ars_electing
-            else:
-                raise xmlrpc_function_xmppmaster("the parameter id_ars_electing [%s] does"\
-                                                    "not belong\nto the server list"\
-                                                        " local share"%id_ars_electing,
-                                                "xmlrpc_share_local_initialisation")
-        else:
+        if id_ars_electing in [None, ""]:
             #on choisie dans la liste 1 ars au hazard.
             idchoise = listearsforsharelocal[randint(0, len(listearsforsharelocal)-1)]
+        elif id_ars_electing in listearsforsharelocal:
+            idchoise = id_ars_electing
+        else:
+            raise xmlrpc_function_xmppmaster("the parameter id_ars_electing [%s] does"\
+                                                    "not belong\nto the server list"\
+                                                        " local share"%id_ars_electing,
+                                            "xmlrpc_share_local_initialisation")
         for ars in result:
             if ars['ars_id'] == idchoise:
                 arselected= ars
                 break
-        logger.debug("the ars web elected is %s [%s]" % (arselected['nameserver'],
-                                                         idchoise))
+        logger.debug(f"the ars web elected is {arselected['nameserver']} [{idchoise}]")
         # creation uri server web package server partage local
         proxy_uri_package_server_on_ars = "http:\\\\%s\\pkgs-%s\\" % (host_server,
                                                                       arselected['nameserver'])

@@ -63,10 +63,10 @@ NB_DB_CONN_TRY = 2
 
 class Singleton(object):
 
-    def __new__(type, *args):
-        if '_the_instance' not in type.__dict__:
-            type._the_instance = object.__new__(type)
-        return type._the_instance
+    def __new__(cls, *args):
+        if '_the_instance' not in cls.__dict__:
+            cls._the_instance = object.__new__(cls)
+        return cls._the_instance
 
 
 
@@ -100,15 +100,13 @@ class PkgsDatabase(DatabaseHelper):
         self.config = confParameter()
 
         self.session = None
-        self.engine_pkgsmmaster_base = create_engine('mysql://%s:%s@%s:%s/%s' % (self.config.pkgs_dbuser,
-                                                                                self.config.pkgs_dbpasswd,
-                                                                                self.config.pkgs_dbhost,
-                                                                                self.config.pkgs_dbport,
-                                                                                self.config.pkgs_dbname),
-                                                    pool_recycle=self.config.pkgs_dbpoolrecycle,
-                                                    pool_size=self.config.pkgs_dbpoolsize,
-                                                    pool_timeout=self.config.pkgs_dbpooltimeout,
-                                                    convert_unicode=True)
+        self.engine_pkgsmmaster_base = create_engine(
+            f'mysql://{self.config.pkgs_dbuser}:{self.config.pkgs_dbpasswd}@{self.config.pkgs_dbhost}:{self.config.pkgs_dbport}/{self.config.pkgs_dbname}',
+            pool_recycle=self.config.pkgs_dbpoolrecycle,
+            pool_size=self.config.pkgs_dbpoolsize,
+            pool_timeout=self.config.pkgs_dbpooltimeout,
+            convert_unicode=True,
+        )
 
         self.metadata = MetaData(self.engine_pkgsmmaster_base)
         if not self.initTables():
@@ -242,11 +240,7 @@ class PkgsDatabase(DatabaseHelper):
 
         request = session.query(Packages).filter(Packages.uuid == package['id']).first()
 
-        if request is None:
-            new_package = Packages()
-        else:
-            new_package = request
-
+        new_package = Packages() if request is None else request
         new_package.label = package['name']
         new_package.uuid = package['id']
         new_package.description = package['description']
@@ -325,10 +319,7 @@ class PkgsDatabase(DatabaseHelper):
         """
 
         ret = session.query(Packages).all()
-        packages = []
-        for package in ret:
-            packages.append(package.to_array())
-        return packages
+        return [package.to_array() for package in ret]
 
     @DatabaseHelper._sessionm
     def remove_package(self, session, uuid):
@@ -344,10 +335,7 @@ class PkgsDatabase(DatabaseHelper):
     @DatabaseHelper._sessionm
     def list_all_extensions(self, session):
         ret = session.query(Extensions).order_by(asc(Extensions.rule_order)).all()
-        extensions = []
-        for extension in ret:
-            extensions.append(extension.to_array())
-        return extensions
+        return [extension.to_array() for extension in ret]
 
     @DatabaseHelper._sessionm
     def delete_extension(self,session, id):
@@ -527,10 +515,7 @@ class PkgsDatabase(DatabaseHelper):
         pendinglist = session.query(distinct(Syncthingsync.uuidpackage).label("uuidpackage")).all()
         session.commit()
         session.flush()
-        result_list = []
-        for packageuid in pendinglist:
-            result_list.append(packageuid.uuidpackage)
-        return result_list
+        return [packageuid.uuidpackage for packageuid in pendinglist]
 
 
     @DatabaseHelper._sessionm
@@ -574,23 +559,24 @@ class PkgsDatabase(DatabaseHelper):
                 next = False
 
         query = session.query(Packages.label,\
-            Packages.version,\
-            Packages.Qsoftware,\
-            Packages.Qversion,\
-            Packages.Qvendor,\
-            Packages.description).filter(Packages.uuid == package_id).first()
+                Packages.version,\
+                Packages.Qsoftware,\
+                Packages.Qversion,\
+                Packages.Qvendor,\
+                Packages.description).filter(Packages.uuid == package_id).first()
         session.commit()
         session.flush()
         result = {
-            'name' : '',
+            'name': '',
             'version': '',
-            'Qsoftware' : '',
-            'Qversion' : '',
+            'Qsoftware': '',
+            'Qversion': '',
             'Qvendor': '',
-            'description' : '',
-            'files' : files,
-            'size' : size,
-            'Size' : '%s %s'%(round(size/(diviser**count), 2), units[count])}
+            'description': '',
+            'files': files,
+            'size': size,
+            'Size': f'{round(size / diviser**count, 2)} {units[count]}',
+        }
 
         if query is not None:
             result['name'] = query.label
@@ -765,7 +751,7 @@ class PkgsDatabase(DatabaseHelper):
         result = session.execute(sql)
         session.commit()
         session.flush()
-        return [x for x in result]
+        return list(result)
 
     @DatabaseHelper._sessionm
     def pkgs_sharing_rule_search(self, session, loginname, type="local"):
@@ -829,27 +815,26 @@ class PkgsDatabase(DatabaseHelper):
         if result:
             # create dict partage
             for y in result:
-                resuldict={}
-                resuldict['id_sharing']=y[0]
-                resuldict['name']=y[1]
-                resuldict['comments']=y[2]
-                resuldict['type']=y[4]
-                resuldict['uri']=y[5]
-                resuldict['ars_name']=y[6]
-                resuldict['ars_id']=y[7]
-                resuldict['share_path']=y[8]
-                # information from table pkgs_rules_local or pkgs_rules_global
-                resuldict['id_rule']=y[9]
-                resuldict['algos_id']=y[10]
-                resuldict['order_rule']=y[11]
-                resuldict['regexp']=y[12]
+                resuldict = {
+                    'id_sharing': y[0],
+                    'name': y[1],
+                    'comments': y[2],
+                    'type': y[4],
+                    'uri': y[5],
+                    'ars_name': y[6],
+                    'ars_id': y[7],
+                    'share_path': y[8],
+                    'id_rule': y[9],
+                    'algos_id': y[10],
+                    'order_rule': y[11],
+                    'regexp': y[12],
+                }
                 ret.append(resuldict)
         return ret
 
     def get_shares(self, session):
         query = session.query(Pkgs_shares).all()
-        ret = [elem.toH() for elem in query]
-        return ret
+        return [elem.toH() for elem in query]
 
     @DatabaseHelper._sessionm
     def pkgs_sharing_admin_profil(self, session):
@@ -868,7 +853,7 @@ class PkgsDatabase(DatabaseHelper):
                     pkgs.pkgs_shares
                 WHERE
                      pkgs.pkgs_shares.enabled = 1;"""
-        logging.getLogger().debug(str(sql))
+        logging.getLogger().debug(sql)
         result = session.execute(sql)
         session.commit()
         session.flush()
@@ -876,14 +861,15 @@ class PkgsDatabase(DatabaseHelper):
         if result:
             # create dict partage
             for y in result:
-                resuldict={}
-                resuldict['id_sharing']=y[0]
-                resuldict['name']=y[1]
-                resuldict['comments']=y[2]
-                resuldict['type']=y[4]
-                resuldict['uri']=y[5]
-                resuldict['ars_name']=y[6]
-                resuldict['ars_id']=y[7]
-                resuldict['share_path']=y[8]
+                resuldict = {
+                    'id_sharing': y[0],
+                    'name': y[1],
+                    'comments': y[2],
+                    'type': y[4],
+                    'uri': y[5],
+                    'ars_name': y[6],
+                    'ars_id': y[7],
+                    'share_path': y[8],
+                }
                 ret.append(resuldict)
         return ret

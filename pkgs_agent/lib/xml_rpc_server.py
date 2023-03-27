@@ -103,11 +103,10 @@ class TwistedRPCServer(xmlrpc.XMLRPC):
         return server.NOT_DONE_YET
 
     def _ebRender(self, failure, functionPath, args, request):
-        logger.error("Error during render " + functionPath + ": " + failure.getTraceback())
-        # Prepare a Fault result to return
-        result = {}
-        result['faultString'] = functionPath + " " + str(args)
-        result['faultCode'] = str(failure.type) + ": " + str(failure.value) + " "
-        result['faultTraceback'] = failure.getTraceback()
-        return result
+        logger.error(f"Error during render {functionPath}: {failure.getTraceback()}")
+        return {
+            'faultString': f"{functionPath} {str(args)}",
+            'faultCode': f"{str(failure.type)}: {str(failure.value)} ",
+            'faultTraceback': failure.getTraceback(),
+        }
     

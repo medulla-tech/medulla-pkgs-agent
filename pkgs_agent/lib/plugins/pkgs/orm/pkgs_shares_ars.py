@@ -34,28 +34,16 @@ class Pkgs_shares_ars(object):
     colunm : 'id,hostname,jid,pkgs_shares_id
     """
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getHostname(self):
-        if self.hostname is not None:
-            return self.hostname
-        else:
-            return ""
+        return self.hostname if self.hostname is not None else ""
 
     def getJid(self):
-        if self.jid is not None:
-            return self.jid
-        else:
-            return ""
+        return self.jid if self.jid is not None else ""
 
     def getShareid(self):
-        if self.pkgs_shares_id is not None:
-            return self.pkgs_shares_ars
-        else:
-            return ""
+        return self.pkgs_shares_ars if self.pkgs_shares_id is not None else ""
 
     def to_array(self):
         """

@@ -49,7 +49,7 @@ class CommandsOnHostPhase(object):
 
     def is_state(self, state):
         ret = self.state == state
-        logging.getLogger().debug("is_state %s: %s" % (state, ret))
+        logging.getLogger().debug(f"is_state {state}: {ret}")
         return ret
 
     def switch_to_done(self):
@@ -83,7 +83,7 @@ class CommandsOnHostPhase(object):
 
     def set_state(self, state):
         self.state = state
-        logging.getLogger().debug("<%s> phase state: %s" % (self.name, state))
+        logging.getLogger().debug(f"<{self.name}> phase state: {state}")
         self.flush()
 
     def toDict(self, relations=False):

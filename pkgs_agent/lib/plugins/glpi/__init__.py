@@ -94,13 +94,10 @@ class Glpi(object):
         self.sessionglpi = None
 
         #utilisation glpi base
-        self.engine_glpi = create_engine('mysql://%s:%s@%s:%s/%s'%( self.config.glpi_dbuser,
-                                                                self.config.glpi_dbpasswd,
-                                                                self.config.glpi_dbhost,
-                                                                self.config.glpi_dbport,
-                                                                self.config.glpi_dbname),
-                                    pool_recycle = self.config.dbpoolrecycle,
-                                    pool_size = self.config.dbpoolsize
+        self.engine_glpi = create_engine(
+            f'mysql://{self.config.glpi_dbuser}:{self.config.glpi_dbpasswd}@{self.config.glpi_dbhost}:{self.config.glpi_dbport}/{self.config.glpi_dbname}',
+            pool_recycle=self.config.dbpoolrecycle,
+            pool_size=self.config.dbpoolsize,
         )
 
         try:

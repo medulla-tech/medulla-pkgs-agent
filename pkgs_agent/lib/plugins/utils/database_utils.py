@@ -65,7 +65,7 @@ def fromUUID(uuid):
     return int(uuid.replace('UUID', ''))
 
 def toUUID(uuid):
-    return "UUID%s" % (str(uuid))
+    return f"UUID{str(uuid)}"
 
 def setUUID(obj):
     if hasattr(obj, 'id'):
@@ -73,5 +73,5 @@ def setUUID(obj):
     elif hasattr(obj, 'ID'):
         setattr(obj, 'uuid', toUUID(obj.ID))
     else:
-        logging.getLogger().error("Can't get id for %s => no UUID"%(str(obj)))
+        logging.getLogger().error(f"Can't get id for {str(obj)} => no UUID")
     return obj

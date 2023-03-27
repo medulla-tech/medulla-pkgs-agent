@@ -44,52 +44,45 @@ class Commands(object):
     Mapping between msc.commands and SA
     """
     def getId(self):
-        result = self.id
-        return result
+        return self.id
 
     def getBundleId(self):
-        result = self.fk_bundle
-        return result
+        return self.fk_bundle
 
     def getOrderInBundle(self):
-        result = self.order_in_bundle
-        return result
+        return self.order_in_bundle
 
     def isPartOfABundle(self):
         result = self.fk_bundle is not None
-        logging.getLogger().debug("isPartOfABundle(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"isPartOfABundle(#{self.id}): {result}")
         return result
 
     def getNextConnectionDelay(self):
-        result = self.next_connection_delay
-        return result
+        return self.next_connection_delay
 
     def hasToWOL(self):
         result = self.do_wol == 'enable'
-        logging.getLogger().debug("hasToWOL(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"hasToWOL(#{self.id}): {result}")
         return result
 
     def hasToImagingMenu(self):
         result = self.do_imaging_menu == 'enable'
-        logging.getLogger().debug("hasToImagingMenu(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToImagingMenu(#{self.id}): {result}")
         return result
 
     def hasToRunInventory(self):
         result = self.do_inventory == 'enable'
-        logging.getLogger().debug("hasToRunInventory(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToRunInventory(#{self.id}): {result}")
         return result
 
     def hasToReboot(self):
         result = self.do_reboot == 'enable'
-        logging.getLogger().debug("hasToReboot(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"hasToReboot(#{self.id}): {result}")
         return result
 
     def hasToHalt(self):
         result = len(self.do_halt) > 0
-        logging.getLogger().debug("hasToHalt(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"hasToHalt(#{self.id}): {result}")
         return result
 
     def hasToHaltIfDone(self):
@@ -97,8 +90,7 @@ class Commands(object):
             result = 'done' in self.do_halt.split(',')
         except AttributeError:  # workaround for buggy v.14 database
             result = 'done' in self.do_halt
-        logging.getLogger().debug("hasToHaltIfDone(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToHaltIfDone(#{self.id}): {result}")
         return result
 
     def hasToHaltIfFailed(self):
@@ -106,8 +98,7 @@ class Commands(object):
             result = 'failed' in self.do_halt.split(',')
         except AttributeError:  # workaround for buggy v.14 database
             result = 'failed' in self.do_halt
-        logging.getLogger().debug("hasToHaltIfFailed(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToHaltIfFailed(#{self.id}): {result}")
         return result
 
     def hasToHaltIfOverTime(self):
@@ -115,8 +106,7 @@ class Commands(object):
             result = 'over_time' in self.do_halt.split(',')
         except AttributeError:  # workaround for buggy v.14 database
             result = 'over_time' in self.do_halt
-        logging.getLogger().debug("hasToHaltIfOverTime(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToHaltIfOverTime(#{self.id}): {result}")
         return result
 
     def hasToHaltIfOutOfInterval(self):
@@ -124,61 +114,56 @@ class Commands(object):
             result = 'out_of_interval' in self.do_halt.split(',')
         except AttributeError:
             result = 'out_of_interval' in self.do_halt
-        logging.getLogger().debug("hasToHaltIfOutOfInterval(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasToHaltIfOutOfInterval(#{self.id}): {result}")
         return result
 
     def hasSomethingToUpload(self):
         result = (len(self.files) != 0)
-        logging.getLogger().debug("hasSomethingToUpload(#%s): %s" %
-                                  (self.id, result))
+        logging.getLogger().debug(f"hasSomethingToUpload(#{self.id}): {result}")
         return result
 
     def hasSomethingToExecute(self):
         result = len(self.start_file) != 0
-        logging.getLogger().debug("hasSomethingToExecute(#%s): %s" %
-                                  (self.getId(), result))
+        logging.getLogger().debug(f"hasSomethingToExecute(#{self.getId()}): {result}")
         return result
 
     def hasSomethingToDelete(self):
         result = len(self.files) != 0
-        logging.getLogger().debug("hasSomethingToDelete(#%s): %s" %
-                                  (self.getId(), result))
+        logging.getLogger().debug(f"hasSomethingToDelete(#{self.getId()}): {result}")
         return result
 
     def hasToUseProxy(self):
-        result = (self.proxy_mode == 'queue' or self.proxy_mode == 'split')
-        logging.getLogger().debug("hasToUseProxy(#%s): %s" %
-                                  (self.getId(), result))
+        result = self.proxy_mode in ['queue', 'split']
+        logging.getLogger().debug(f"hasToUseProxy(#{self.getId()}): {result}")
         return result
 
     def hasToUseQueueProxy(self):
         result = (self.proxy_mode == 'queue')
-        logging.getLogger().debug("hasToUseQueueProxy(#%s): %s" %
-                                  (self.getId(), result))
+        logging.getLogger().debug(f"hasToUseQueueProxy(#{self.getId()}): {result}")
         return result
 
     def hasToUseSplitProxy(self):
         result = (self.proxy_mode == 'split')
-        logging.getLogger().debug("hasToUseSplitProxy(#%s): %s" %
-                                  (self.getId(), result))
+        logging.getLogger().debug(f"hasToUseSplitProxy(#{self.getId()}): {result}")
         return result
 
     def isQuickAction(self):
         # TODO: a quick action is not only an action with nothing to upload
         result = (len(self.files) == 0)
-        logging.getLogger().debug("isQuickAction(#%s): %s" % (self.id, result))
+        logging.getLogger().debug(f"isQuickAction(#{self.id}): {result}")
         return result
 
     def inDeploymentInterval(self):
         # TODO: a quick action is not only an action with nothing to upload
-        if not self.deployment_intervals:  # no interval given => always perform
-            result = True
-        else:
-            result = LaunchTimeResolver().in_deployment_interval(self.deployment_intervals, datetime.datetime.today())
+        result = (
+            LaunchTimeResolver().in_deployment_interval(
+                self.deployment_intervals, datetime.datetime.now()
+            )
+            if self.deployment_intervals
+            else True
+        )
         if not result:
-            logging.getLogger().debug("inDeploymentInterval(#%s): %s" %
-                                      (self.id, result))
+            logging.getLogger().debug(f"inDeploymentInterval(#{self.id}): {result}")
         return result
 
     def in_valid_time(self):
@@ -214,31 +199,11 @@ class Commands(object):
         self.flush()
 
     def update_stats(self, session=None, **kwargs):
-        if "scheduled" in kwargs:
-            self.sum_running = kwargs["scheduled"]
-        else:
-            self.sum_running = 0
-
-        if "done" in kwargs:
-            self.sum_done = kwargs["done"]
-        else:
-            self.sum_done = 0
-
-        if "stopped" in kwargs:
-            self.sum_stopped = kwargs["stopped"]
-        else:
-            self.sum_stopped = 0
-
-        if "failed" in kwargs:
-            self.sum_failed = kwargs["failed"]
-        else:
-            self.sum_failed = 0
-
-        if "over_timed" in kwargs:
-            self.sum_overtimed = kwargs["over_timed"]
-        else:
-            self.sum_overtimed = 0
-
+        self.sum_running = kwargs.get("scheduled", 0)
+        self.sum_done = kwargs.get("done", 0)
+        self.sum_stopped = kwargs.get("stopped", 0)
+        self.sum_failed = kwargs.get("failed", 0)
+        self.sum_overtimed = kwargs.get("over_timed", 0)
         if not session:
             self.flush()
 

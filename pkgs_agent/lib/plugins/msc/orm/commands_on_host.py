@@ -50,14 +50,14 @@ class CommandsOnHost(object):
         self.setCommandStatut('in_progress')
     def isStateRunning(self):
         result = self.getCommandStatut() == 'in_progress'
-        logging.getLogger().debug("isStateRunning(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isStateRunning(#{self.getId()}): {result}")
         return result
 
     def setStateScheduled(self):
         self.setCommandStatut('scheduled')
     def isStateScheduled(self):
-        result = (self.getCommandStatut() == 'scheduled' or self.getCommandStatut() == 're_scheduled')
-        logging.getLogger().debug("isStateScheduled(#%s): %s" % (self.getId(), result))
+        result = self.getCommandStatut() in ['scheduled', 're_scheduled']
+        logging.getLogger().debug(f"isStateScheduled(#{self.getId()}): {result}")
         return result
 
     def setStateDone(self):
@@ -65,7 +65,7 @@ class CommandsOnHost(object):
         self.setEndDate() # final state: we may write the date down
     def isStateDone(self):
         result = (self.getCommandStatut() == 'done')
-        logging.getLogger().debug("isStateDone(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isStateDone(#{self.getId()}): {result}")
         return result
 
     def setStateFailed(self):
@@ -73,7 +73,7 @@ class CommandsOnHost(object):
         self.setEndDate() # final state: we may write the date down
     def isStateFailed(self):
         result = (self.getCommandStatut() == 'failed')
-        logging.getLogger().debug("isStateFailed(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isStateFailed(#{self.getId()}): {result}")
         return result
 
     def setStateStopped(self):
@@ -82,15 +82,15 @@ class CommandsOnHost(object):
         if self.getCommandStatut() == 'stop': # 'stop' deprecated a while ago, but may still be present, so we take the opportunity to fix it here
             logging.getLogger().warn("Detected command #%s in deprecated state 'stop', setting it to 'stopped'")
             self.setStateStopped()
-        result = (self.getCommandStatut() == 'stop' or self.getCommandStatut() == 'stopped')
-        logging.getLogger().debug("isStateStopped(#%s): %s" % (self.getId(), result))
+        result = self.getCommandStatut() in ['stop', 'stopped']
+        logging.getLogger().debug(f"isStateStopped(#{self.getId()}): {result}")
         return result
 
     def setStatePaused(self):
         self.setCommandStatut('pause')
     def isStatePaused(self):
-        result = (self.getCommandStatut() == 'pause' or self.getCommandStatut() == 'paused')
-        logging.getLogger().debug("isStatePaused(#%s): %s" % (self.getId(), result))
+        result = self.getCommandStatut() in ['pause', 'paused']
+        logging.getLogger().debug(f"isStatePaused(#{self.getId()}): {result}")
         return result
     def toggleStatePaused(self):
         if self.isStatePaused():
@@ -102,14 +102,14 @@ class CommandsOnHost(object):
         self.setCommandStatut('over_timed')
     def isStateOverTimed(self):
         result = (self.getCommandStatut() == 'over_timed')
-        logging.getLogger().debug("isStateOverTimed(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isStateOverTimed(#{self.getId()}): {result}")
         return result
 
     def setStateUnreachable(self):
         self.setCommandStatut('not_reachable')
     def isStateUnreachable(self):
         result = (self.getCommandStatut() == 'not_reachable')
-        logging.getLogger().debug("isStateUnreachable(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isStateUnreachable(#{self.getId()}): {result}")
         return result
 
     def setCommandStatut(self, current_state):
@@ -139,21 +139,21 @@ class CommandsOnHost(object):
         # fk_use_as_proxy is set (ie I found a proxy server)
         # fk_use_as_proxy is not equal to my id (ie the proxy server is not me)
         result = (self.fk_use_as_proxy is not None and self.fk_use_as_proxy != self.id)
-        logging.getLogger().debug("isProxyClient(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isProxyClient(#{self.getId()}): {result}")
         return result
     def isProxyServer(self):
         # I'm a server if:
         # order_in_proxy is set (ie I have chance to become a server)
         # fk_use_as_proxy is equal to my id (ie the proxy server is me)
         result = (self.order_in_proxy is not None and self.fk_use_as_proxy == self.id)
-        logging.getLogger().debug("isProxyServer(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isProxyServer(#{self.getId()}): {result}")
         return result
     def isLocalProxy(self):
         # I'm a server if:
         # order_in_proxy is set (ie I have chance to become a server)
         # fk_use_as_proxy is equal to my id (ie the proxy server is me)
         result = (self.order_in_proxy is not None)
-        logging.getLogger().debug("isLocalProxy(#%s): %s" % (self.getId(), result))
+        logging.getLogger().debug(f"isLocalProxy(#{self.getId()}): {result}")
         return result
 
     def setOrderInProxy(self, order_in_proxy):
@@ -200,9 +200,8 @@ class CommandsOnHost(object):
             return True if processing can continue
             else return False
         """
-        if decrement:
-            if self.attempts_total > self.attempts_failed :
-                self.attempts_failed += 1
+        if decrement and self.attempts_total > self.attempts_failed:
+            self.attempts_failed += 1
         self.next_launch_date = launch_date
         self.flush()
         return True
@@ -315,7 +314,7 @@ class CoHManager :
     """ Manager class to encapsulate the methods bellow. """
 
     @classmethod
-    def setBalances (cls, coh_balances):
+    def setBalances(cls, coh_balances):
         """
         Multiple update of balances.
 
@@ -323,9 +322,8 @@ class CoHManager :
         @type coh_balances: list
         """
         session = sqlalchemy.orm.create_session()
-        for coh_id, balance in coh_balances :
-            myCommandOnHost = session.query(CommandsOnHost).get(coh_id)
-            if myCommandOnHost :
+        for coh_id, balance in coh_balances:
+            if myCommandOnHost := session.query(CommandsOnHost).get(coh_id):
                 myCommandOnHost.balance = balance
                 session.add(myCommandOnHost)
                 session.flush()
@@ -340,9 +338,8 @@ class CoHManager :
         @type ids: list
         """
         session = sqlalchemy.orm.create_session()
-        for id in ids :
-            myCommandOnHost = session.query(CommandsOnHost).get(id)
-            if myCommandOnHost :
+        for id in ids:
+            if myCommandOnHost := session.query(CommandsOnHost).get(id):
                 myCommandOnHost.current_state = state
                 session.add(myCommandOnHost)
                 session.flush()
@@ -367,9 +364,8 @@ class CoHManager :
         @type ids: list
         """
         session = sqlalchemy.orm.create_session()
-        for id in ids :
-            myCommandOnHost = session.query(CommandsOnHost).get(id)
-            if myCommandOnHost :
+        for id in ids:
+            if myCommandOnHost := session.query(CommandsOnHost).get(id):
                 if myCommandOnHost.current_state in ('done', 'failed', 'over_timed'):
                     continue
                 myCommandOnHost.current_state = 'scheduled'
@@ -392,9 +388,8 @@ class CoHManager :
         """
         cmd_groups = {}
         session = sqlalchemy.orm.create_session()
-        for id in ids :
-            coh = session.query(CommandsOnHost).get(id)
-            if coh :
+        for id in ids:
+            if coh := session.query(CommandsOnHost).get(id):
                 if coh.isStateDone() or coh.isStateFailed() or coh.isStateOverTimed():
                     continue
                 coh.current_state = "stopped"

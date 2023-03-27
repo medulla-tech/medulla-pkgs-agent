@@ -113,14 +113,8 @@ def doTask(opts):
     # more information log
     # format ='[%(name)s : %(funcName)s : %(lineno)d] - %(levelname)s - %(message)s'
     conf = confParameter(opts.dft_inifile)
-    if not opts.deamon:
-        if opts.consoledebug :
-            logging.basicConfig(level = logging.DEBUG, format=format)
-        else:
-            logging.basicConfig( level = conf.log_level,
-                                 format = format,
-                                 filename = conf.logfile,
-                                 filemode = 'a')
+    if not opts.deamon and opts.consoledebug:
+        logging.basicConfig(level = logging.DEBUG, format=format)
     else:
         logging.basicConfig( level = conf.log_level,
                              format = format,

@@ -36,46 +36,25 @@ class Pkgs_shares_ars_web(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getArs_share_id(self):
-        if self.ars_share_id is not None:
-            return self.ars_share_id
-        else:
-            return-1
+        return self.ars_share_id if self.ars_share_id is not None else -1
 
     def getPackages_id(self):
-        if self.packages_id is not None:
-            return self.packages_id
-        else:
-            return ""
+        return self.packages_id if self.packages_id is not None else ""
 
     def getStatus(self):
-        if self.status is not None:
-            return self.status
-        else:
-            return ""
+        return self.status if self.status is not None else ""
 
     def getFinger_print(self):
-        if self.finger_print is not None:
-            return self.finger_print
-        else:
-            return ""
+        return self.finger_print if self.finger_print is not None else ""
 
     def getSize(self):
-        if self.size is not None:
-            return self.size
-        else:
-            return 0
+        return self.size if self.size is not None else 0
 
     def getEdition_date(self):
-        if self.date_edition is not None:
-            return self.date_edition
-        else:
-            return ""
+        return self.date_edition if self.date_edition is not None else ""
 
     def to_array(self):
         return {

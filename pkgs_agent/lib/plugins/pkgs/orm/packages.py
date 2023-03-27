@@ -36,64 +36,34 @@ class Packages(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getLabel(self):
-        if self.label != None:
-            return self.label
-        else:
-            return ""
+        return self.label if self.label != None else ""
 
     def getDescription(self):
-        if self.description is not None:
-            return self.description
-        else:
-            return ""
+        return self.description if self.description is not None else ""
 
     def getUuid(self):
-        if self.uuid is not None:
-            return self.uuid
-        else:
-            return ""
+        return self.uuid if self.uuid is not None else ""
 
     def getVersion(self):
-        if self.version is not None:
-            return self.version
-        else:
-            return ""
+        return self.version if self.version is not None else ""
 
     def getOs(self):
-        if self.os is not None:
-            return self.os
-        else:
-            return ""
+        return self.os if self.os is not None else ""
 
     def getMetaGenerator(self):
-        if self.metagenerator is not None:
-            return self.metagenerator
-        else:
-            return "expert"
+        return self.metagenerator if self.metagenerator is not None else "expert"
 
     def getEntity_id(self):
-        if self.entity_id is not None:
-            return self.entity_id
-        else:
-            return "0"
+        return self.entity_id if self.entity_id is not None else "0"
 
     def getSub_packages(self):
-        if self.sub_packages is not None:
-            return self.sub_packages
-        else:
-            return ""
+        return self.sub_packages if self.sub_packages is not None else ""
 
     def getReboot(self):
-        if self.reboot is not None:
-            return self.getReboot
-        else:
-            return ""
+        return self.getReboot if self.reboot is not None else ""
 
     def getInventory_associateinventory(self):
         if self.inventory_associateinventory is not None:
@@ -102,34 +72,19 @@ class Packages(object):
             return ""
 
     def getInventory_licenses(self):
-        if self.inventory_licenses is not None:
-            return self.inventory_licenses
-        else:
-            return ""
+        return self.inventory_licenses if self.inventory_licenses is not None else ""
 
     def getQversion(self):
-        if self.Qversion is not None:
-            return self.Qversion
-        else:
-            return ""
+        return self.Qversion if self.Qversion is not None else ""
 
     def getQvendor(self):
-        if self.Qvendor is not None:
-            return self.Qvendor
-        else:
-            return ""
+        return self.Qvendor if self.Qvendor is not None else ""
 
     def getQsoftware(self):
-        if self.Qsoftware is not None:
-            return self.Qsoftware
-        else:
-            return ""
+        return self.Qsoftware if self.Qsoftware is not None else ""
 
     def getBoolcnd(self):
-        if self.boolcnd is not None:
-            return self.boolcnd
-        else:
-            return 0
+        return self.boolcnd if self.boolcnd is not None else 0
 
     def getPostCommandSuccess_command(self):
         if self.postCommandSuccess_command is not None:
@@ -143,16 +98,10 @@ class Packages(object):
         else:
             return ""
     def getInstallInit_command(self):
-        if self.installInit_command is not None:
-            return self.installInit_command
-        else:
-            return ""
+        return self.installInit_command if self.installInit_command is not None else ""
 
     def getInstallInit_name(self):
-        if self.installInit_name is not None:
-            return self.installInit_name
-        else:
-            return ""
+        return self.installInit_name if self.installInit_name is not None else ""
 
     def getPostCommandFailure_command(self):
         if self.postCommandFailure_command is not None:
@@ -167,28 +116,16 @@ class Packages(object):
             return ""
 
     def getCommand_command(self):
-        if self.command_command is not None:
-            return self.command_command
-        else:
-            return ""
+        return self.command_command if self.command_command is not None else ""
 
     def getCommand_name(self):
-        if self.command_name is not None:
-            return self.command_name
-        else:
-            return ""
+        return self.command_name if self.command_name is not None else ""
 
     def getPreCommand_command(self):
-        if self.preCommand_command is not None:
-            return self.preCommand_command
-        else:
-            return ""
+        return self.preCommand_command if self.preCommand_command is not None else ""
 
     def getPreCommand_name(self):
-        if self.preCommand_name is not None:
-            return self.preCommand_name
-        else:
-            return ""
+        return self.preCommand_name if self.preCommand_name is not None else ""
 
 
     def to_array(self):

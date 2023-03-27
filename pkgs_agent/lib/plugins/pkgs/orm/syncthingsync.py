@@ -33,40 +33,22 @@ class Syncthingsync(object):
     """
 
     def getId(self):
-        if self.id is not None:
-            return self.id
-        else:
-            return 0
+        return self.id if self.id is not None else 0
 
     def getDate(self):
-        if self.date != None:
-            return self.date
-        else:
-            return ""
+        return self.date if self.date != None else ""
 
     def getUuidpackage(self):
-        if self.uuidpackage is not None:
-            return self.uuidpackage
-        else:
-            return ""
+        return self.uuidpackage if self.uuidpackage is not None else ""
 
     def getTypesynchro(self):
-        if self.typesynchro is not None:
-            return self.typesynchro
-        else:
-            return ""
+        return self.typesynchro if self.typesynchro is not None else ""
 
     def getRelayserver_jid(self):
-        if self.relayserver_jid is not None:
-            return self.relayserver_jid
-        else:
-            return ""
+        return self.relayserver_jid if self.relayserver_jid is not None else ""
 
     def getWatching(self):
-        if self.watching is not None:
-            return self.watching
-        else:
-            return ""
+        return self.watching if self.watching is not None else ""
 
 
     def to_array(self):

@@ -30,7 +30,7 @@ class SingletonDecorator:
         self.instance = None
 
     def __call__(self, *args, **kwds):
-        if self.instance == None:
+        if self.instance is None:
             self.instance = self.klass(*args, **kwds)
         return self.instance
 
@@ -40,8 +40,8 @@ class confParameter:
         self.dft_inifile = dft_inifile
         Config = ConfigParser.ConfigParser()
         Config.read(self.dft_inifile)
-        if os.path.exists(self.dft_inifile + ".local"):
-            Config.read(self.dft_inifile + ".local")
+        if os.path.exists(f"{self.dft_inifile}.local"):
+            Config.read(f"{self.dft_inifile}.local")
 
         if Config.has_option("xmlrpc", "user"):
             self.user = Config.get('xmlrpc',
@@ -319,17 +319,27 @@ class confParameter:
         if '' in confiobject.sections():
             logging.getLogger().debug('[GLPI] Get manufacturers and their warranty infos')
             for manufacturer_key in confiobject.options('manufacturers'):
-                if confiobject.has_section('manufacturer_' + manufacturer_key) and confiobject.has_option('manufacturer_' + manufacturer_key, 'url'):
+                if confiobject.has_section(
+                    f'manufacturer_{manufacturer_key}'
+                ) and confiobject.has_option(
+                    f'manufacturer_{manufacturer_key}', 'url'
+                ):
                     try:
-                        type = confiobject.get('manufacturer_' + manufacturer_key, 'type')
+                        type = confiobject.get(f'manufacturer_{manufacturer_key}', 'type')
                     except NoOptionError:
                         type = "get"
                     try:
-                        params = confiobject.get('manufacturer_' + manufacturer_key, 'params')
+                        params = confiobject.get(f'manufacturer_{manufacturer_key}', 'params')
                     except NoOptionError:
                         params = ""
-                    self.manufacturerWarranty[manufacturer_key] = {'names': confiobject.get('manufacturers', manufacturer_key).split('||'),
-                                                                   'type': type,
-                                                                   'url': confiobject.get('manufacturer_' + manufacturer_key, 'url'),
-                                                                   'params': params}
+                    self.manufacturerWarranty[manufacturer_key] = {
+                        'names': confiobject.get(
+                            'manufacturers', manufacturer_key
+                        ).split('||'),
+                        'type': type,
+                        'url': confiobject.get(
+                            f'manufacturer_{manufacturer_key}', 'url'
+                        ),
+                        'params': params,
+                    }
             logging.getLogger().debug(self.manufacturerWarranty)
