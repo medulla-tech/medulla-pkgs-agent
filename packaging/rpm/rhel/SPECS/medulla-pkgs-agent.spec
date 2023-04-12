@@ -24,7 +24,7 @@ Requires:   python-twisted-web
 Requires:   python-twisted-core
 
 %description
-Pulse XMPP Agent
+Medulla XMPP Agent
 
 %files 
 %_sbindir/pulse_agent_xmlrpc_pkgs.py
